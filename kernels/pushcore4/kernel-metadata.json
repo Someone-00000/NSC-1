@@ -1,0 +1,14 @@
+{
+  "id": "potatto007/nsc1-teach-core4",
+  "title": "nsc1-teach-core4",
+  "code_file": "nsc1-teach-core4.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_internet": true,
+  "dataset_sources": [],
+  "kernel_sources": [],
+  "competition_sources": [],
+  "model_sources": []
+}

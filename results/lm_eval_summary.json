@@ -1,0 +1,24 @@
+{
+ "run0": {
+  "error": "TimeoutExpired(['python', '-m', 'lm_eval', '--model', 'hf', '--model_args', 'pretrained=Qwen/Qwen3.5-0.8B,dtype=bfloat16,trust_remote_code=True,max_length=2048', '--tasks', 'mmlu,arc_challenge,hellaswag,winogrande', '--num_fewshot', '5', '--batch_size', 'auto', '--output_path', '/kaggle/working/lm_e"
+ },
+ "run1": {
+  "returncode": 1
+ },
+ "run2": {
+  "returncode": 0
+ },
+ "results": {
+  "Qwen__Qwen3.5-0.8B": {
+   "gsm8k": {
+    "name": "gsm8k",
+    "alias": "gsm8k",
+    "sample_len": 200,
+    "exact_match,strict-match": 0.34,
+    "exact_match_stderr,strict-match": 0.03358032446172574,
+    "exact_match,flexible-extract": 0.345,
+    "exact_match_stderr,flexible-extract": 0.03369796379336736
+   }
+  }
+ }
+}

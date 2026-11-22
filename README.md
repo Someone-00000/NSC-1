@@ -1,0 +1,102 @@
+# NSC-1 — Subconscious-Gated Anti-Hallucination Architecture
+
+NSC-1 tests one idea: **hallucination is not a knowledge problem, it is a decision-ordering problem.**
+Language models decide *what to say* and *say it* in the same pass. Humans do not — a pre-conscious
+appraisal classifies a thought as remembered / guessed / unknown **before** articulation begins, and
+that appraisal is what suppresses confabulation. NSC-1 gives a language model exactly that layer:
+
+1. **Stage A (frozen appraiser)** — a small frozen network reads the input and emits a discrete
+   knowledge-state signal `sid` (SIG_ID 3–8: answerable, unknown, partial, pressure/trap contexts).
+   It is frozen, so the generator cannot learn to influence its own judge.
+2. **GateBlock (zero-init gate)** — the state signal is injected into the main LM as a single
+   additive vector: `x = x + gate[None,None,:] * tanh(status_emb(sid)).unsqueeze(1)`.
+   Zero-initialized, so at step 0 the model is exactly the base model; the policy is learned as a
+   smooth deviation from identity.
+3. **Meta-first contract** — the first emitted token must be a status token (`<s_*>`). The model
+   must *commit to an epistemic state before it speaks* — appraisal precedes articulation.
+
+Because the gate is zero-init and additive, flipping it off at inference time with **identical
+weights** isolates its causal contribution. That ON/OFF exam is the core experiment.
+
+## Headline result (454M from-scratch student, closed-loop exam, n = 2,765, same weights)
+
+| behavior | gate OFF | gate ON | delta |
+|---|---|---|---|
+| refuse unknown facts (meta_u) | 0.5929 | **0.9929** | **+40.0pp** |
+| correct false-premise color | 0.5684 | **0.9000** | +33.2pp |
+| resist sycophancy pressure | 0.4167 | **0.6667** | +25.0pp |
+| overall (22 kinds) | 0.4796 | **0.5316** | +5.2pp |
+
+Same weights. Only the gate differs. **The gate causes the policy.** Full per-kind table in
+[docs/RESULTS.md](docs/RESULTS.md).
+
+## What was validated where
+
+| claim | scale | result | status |
+|---|---|---|---|
+| Gate causes honest policy | 454M from scratch, n=2,765 ON/OFF | +5.2pp overall, +40pp unknown-refusal, meta-first 1.0 | **confirmed** |
+| Graft preserves host ability | Qwen3.5-0.8B + frozen Stage A + LoRA (6.46M trainable) | mmlu 0.5000 → 0.5298 (+2.98pp) | **confirmed** |
+| Policy SFT works on real LM | Qwen3.5-0.8B graft, 260-item suite, clean decode path | 0.7615 with textbook corrections | **confirmed** |
+| Gate causality on real LM | same suite, off/full modes | generation-path bug invalidates comparison | **withdrawn — needs one eval-only rerun** |
+| Traps / self-knowledge (0.5B) | trap_*, meta_k kinds | at floor in both modes | **known failure** |
+| Over-refusal cost of gate | near / unknowable / syc_assert | −37.8 / −33.3 / −31.7pp | **known cost** |
+
+## Honesty notes
+
+- The real-model gate ON/OFF suite in `nsc1_qwen_graft.py` generated through
+  `model.generate(inputs_embeds=...)`, which degenerates on Qwen3.5's hybrid DeltaNet
+  (103/260 empty outputs in OFF mode, 181/260 role-token garbage in FULL mode, 594/835 in the
+  835 bench). The published off (0.3192) vs full (0.3731) numbers are therefore **not** valid
+  causal evidence and are retracted in [docs/RESULTS.md](docs/RESULTS.md). Fix identified:
+  keep the `input_ids` path and inject the gate via a forward hook on `embed_tokens`.
+- hellaswag was never measured (3h per-task timeout twice). All other harness numbers are
+  full test sets, not samples.
+
+## Repo map
+
+```
+code/       kernel sources (run on Kaggle GPU)
+  nsc_model.py          NSC-1 architecture (Stage A + GateBlock + LM, 454M config)
+  nsc_stage_a.py        frozen subconscious appraiser (sid tagger)
+  nsc_world.py          synthetic world generator, scorer, encoders
+  nsc_train.py          original trainer; nsc_train_patched.py  current trainer
+  nsc1-05b-train.py     0.5B end-to-end kernel: train -> closed-loop exam -> 835 bench
+  nsc1_qwen_graft.py    graft kernel: Qwen3.5-0.8B + Stage A gate + LoRA policy SFT
+  nsc1-qwen-drift.py    capability-drift probe (mmlu base vs graft)
+  nsc1-teach-core4.py   isolated per-task lm-eval-harness runs for the teacher
+  qwen_bench_kernel.py  Qwen3.5-0.8B live answering of the same 835 questions
+data/       synthetic world data (tagged pool, distill sets, exam, bench pack)
+artifacts/  ckpt_a.pt — Stage A weights (5 MB)
+results/    raw result files from every kernel (JSON / JSONL, unmodified)
+kernels/    Kaggle kernel metadata used to launch the runs
+docs/       THEORY.md (why this architecture exists), RESULTS.md (all numbers)
+```
+
+## Reproduce
+
+All training and evaluation ran as Kaggle GPU kernels against the dataset
+`potatto007/nsc1-data` (seeds: model 9, world 777, pool 909, dev_mix 101, exam 404 —
+fully deterministic reconstruction).
+
+```bash
+# 454M student: train + closed-loop exam + bench
+kaggle kernels push -p kernels/push05b
+# teacher harness (per-task isolated)
+kaggle kernels push -p kernels/pushcore4
+```
+
+Parameters: 453,685,262. Training: 8,779 steps, 7.76h wall on a single Kaggle GPU,
+final loss 0.0592 (lm 0.0177), token accuracy 1.0.
+
+## The three models compared on the 835-question bench (same scorer, no self-grading)
+
+| model | overall |
+|---|---|
+| GLM teacher (recorded Stage F scores) | 0.588 |
+| Qwen3.5-0.8B teacher (live, coverage 751/835) | 0.0906 |
+| Qwen3.5-0.8B + NSC-1 graft | see [docs/RESULTS.md](docs/RESULTS.md) |
+| 0.5B student (from scratch) | 0.0276 |
+
+The 0.5B student's low bench score is expected and honest: a 454M model trained on a synthetic
+corpus has no held-out world knowledge. The architecture's claim is about **policy under known
+ground truth** (the closed-loop exam), not about world coverage.
