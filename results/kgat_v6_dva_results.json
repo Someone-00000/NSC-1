@@ -1,0 +1,122 @@
+{
+ "version": "kgat_v6_dva",
+ "prereg": "results/kgat_v6_dva_prereg.json (frozen before any test eval)",
+ "gates": {
+  "GATE-0": {
+   "train_gold_match": 1000,
+   "rows": 44243,
+   "positives": 373,
+   "test_align": 1319,
+   "t2full_n": 572,
+   "t2full_align": 572,
+   "t2v1_n": 56,
+   "t2v1_align": 56,
+   "result": "PASS"
+  },
+  "GATE-1": {
+   "f7_match": 61449,
+   "f7_total": 61449,
+   "f7_rate": 1.0,
+   "f8_match": 61449,
+   "f8_total": 61449,
+   "f8_rate": 1.0,
+   "result": "PASS (recomputed kNN-10 reproduces stored v3/v4 band features at 100%)
+  },
+  "GATE-2": {
+   "convention": "P1 (mean-form Hessian, L2 not divided by weight sum; reconstructed)",
+   "amendment_disclosed": "state features are 5dp-rounded (full precision lost with rung scripts); G2a/G2b/G2c replace the original 5e-7 weight-match requirement",
+   "G2a_max_w_diff": 0.0001553714123976313,
+   "G2b_artifact_replay": {
+    "acc_strict": 0.03184230477634572,
+    "n": 1319,
+    "acc_when_gold_present": 0.07969639468690702,
+    "oracle_saved": 0.3995451099317665,
+    "top5": 0.10917361637604246,
+    "top10": 0.18043972706595907,
+    "n_correct": 42,
+    "result": "the v4 compiled head replays ALL FOUR v4-reported numbers bit-exactly on the frozen pools"
+   },
+   "G2c_lambda_selected": 0.01,
+   "val200_acc_all": 0.031746031746031744,
+   "val200_acc_gp": 0.08450704225352113,
+   "c0_refit_strict": 0.034874905231235785,
+   "c0_refit_n_correct": 46,
+   "pass": true
+  },
+  "GATE-3": {
+   "mean_ok_strict": 0.014404852160727824,
+   "mean_ok_loose": 0.02577710386656558,
+   "consensus_consistent": 1319,
+   "result": "PASS (v3 control bit-exact)"
+  }
+ },
+ "hashes": {
+  "state_train": "42eb4784dd01033e",
+  "state_test": "e28cb4676a7a0719",
+  "state_hle": "4c05c79eb2450f07",
+  "emb_gsm_train": "7fcb3a59281fac35",
+  "emb_gsm_test_full": "9b0da6379b5bd3d4",
+  "realbench_prereg": "8d9af280356d821b",
+  "v6_prereg": "6c6ace1bd85a5651"
+ },
+ "ridge_readout": {
+  "lambda": 100.0,
+  "val_rmse": 6537.84829428788,
+  "loo_weight_shift_L2": 88886.62684724714,
+  "compile_s": 0.436,
+  "note": "896 weights compiled from 1000 vectors->golds in ONE closed-form solve (0.44s) - the fastest data-to-weight conversion measured in the program"
+ },
+ "arms": {
+  "C0_refit_control": {
+   "d_features": 13, "lambda": 0.01,
+   "val200_acc_all": 0.031746031746031744, "val200_acc_gp": 0.08450704225352113,
+   "GSM8K_full": {"acc_strict": 0.034874905231235785, "n_correct": 46, "n": 1319, "acc_when_gold_present": 0.0872865275142315, "oracle_saved": 0.3995451099317665, "top5": 0.12282031842304776, "top10": 0.19332827899924185},
+   "HLE_T2_full": {"acc_strict": 0.015734265734265736, "n_correct": 9, "n": 572},
+   "HLE_T2_v1": {"acc_strict": 0.017857142857142856, "n_correct": 1, "n": 56},
+   "artifact_anchor_GSM8K_full": {"acc_strict": 0.03184230477634572, "n_correct": 42, "note": "v4 artifact weights replayed on the same pools"},
+   "fit_s": 0.5, "stability_maxdiff": 0.0
+  },
+  "A1_ridge_readout": {
+   "d_features": 14, "lambda": 0.01,
+   "val200_acc_all": 0.037037037037037035, "val200_acc_gp": 0.09859154929577464,
+   "GSM8K_full": {"acc_strict": 0.034874905231235785, "n_correct": 46, "n": 1319, "acc_when_gold_present": 0.0872865275142315, "oracle_saved": 0.3995451099317665, "top5": 0.12206216830932524, "top10": 0.19257012888551933},
+   "HLE_T2_full": {"acc_strict": 0.015734265734265736, "n_correct": 9, "n": 572},
+   "HLE_T2_v1": {"acc_strict": 0.017857142857142856, "n_correct": 1, "n": 56},
+   "fit_s": 0.61, "stability_maxdiff": 0.0
+  },
+  "A2_neighbor_profile": {
+   "d_features": 24, "lambda": 1.0,
+   "val200_acc_all": 0.031746031746031744, "val200_acc_gp": 0.08450704225352113,
+   "GSM8K_full": {"acc_strict": 0.032600454890068235, "n_correct": 43, "n": 1319, "acc_when_gold_present": 0.08159392789373814, "oracle_saved": 0.3995451099317665, "top5": 0.10993176648976498, "top10": 0.18347232752084913},
+   "HLE_T2_full": {"acc_strict": 0.01048951048951049, "n_correct": 6, "n": 572},
+   "HLE_T2_v1": {"acc_strict": 0.0, "n_correct": 0, "n": 56},
+   "fit_s": 0.69, "stability_maxdiff": 0.0
+  },
+  "A3_full_dva": {
+   "d_features": 921, "lambda": 1.0,
+   "val200_acc_all": 0.031746031746031744, "val200_acc_gp": 0.08450704225352113,
+   "GSM8K_full": {"acc_strict": 0.028051554207733132, "n_correct": 37, "n": 1319, "acc_when_gold_present": 0.07020872865275142, "oracle_saved": 0.3995451099317665, "top5": 0.10386656557998483, "top10": 0.14556482183472327},
+   "HLE_T2_full": {"acc_strict": 0.019230769230769232, "n_correct": 11, "n": 572},
+   "HLE_T2_v1": {"acc_strict": 0.0, "n_correct": 0, "n": 56},
+   "fit_s": 89.13, "stability_maxdiff": 0.0,
+   "head_artifact": "download/wspl_kgat_v6_dva_head_A3.json (local-only, 21,284 B, sha256 84124d7c8bb4cc3a)"
+  }
+ },
+ "verdicts": {
+  "best_dva_arm": "A1",
+  "best_strict": 0.034874905231235785,
+  "primary_verdict": "PARTIAL (frozen criterion: best DVA arm 0.034875 > 0.031842 v4 S1, but < 0.040 PASS bar)",
+  "beats_v4_S1": true,
+  "beats_v5_S1": true,
+  "realized_ratio_check": false
+ },
+ "build_times_s": {
+  "load_s": 0.21, "knn_s": 0.24, "ridge_compile_s": 0.436, "channels_s": 0.91,
+  "fit_A1_s": 0.76, "fit_A2_s": 0.72, "fit_A3_s": 95.9, "total_s": 100.5
+ },
+ "verdict_attribution": "A1 == C0 exactly (46/1319 strict, same wgp, same selections; only top5 differs by 1 rank): the direct vector readout channel changed ZERO selections. The refit control (46/1319) vs the v4 artifact (42/1319) gap is a protocol/rounding effect (lambda tie 0.01/1.0 broken toward 0.01 on 5dp-rounded state features), NOT a vector-access gain. H1 (direct vector channels add signal) is REJECTED; H2 (the 13-feature compression is a sufficient statistic of the memory pull at this data scale; more raw access only adds noise: A2 43/1319, A3 37/1319) is SUPPORTED. The frozen primary criterion 'best DVA arm > 0.031842 -> PARTIAL' is met only through that tie - the honest reading: with zero new data, direct vector access does not improve selection; the lever for the big run is data volume compiled into weights, not wider feature access.",
+ "hypotheses": {
+  "H1_signal": "REJECTED - best DVA arm ties C0 exactly; no selection change attributable to vector channels",
+  "H2_sufficiency": "SUPPORTED - monotone degradation with raw-access width: 46 (13 feats) >= 46 (14) >= 43 (24) >= 37 (921)"
+ }
+}

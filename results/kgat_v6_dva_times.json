@@ -1,0 +1,11 @@
+{
+ "load_s": 0.21,
+ "knn_s": 0.24,
+ "ridge_compile_s": 0.436,
+ "channels_s": 0.91,
+ "fit_A1_s": 0.76,
+ "fit_A2_s": 0.72,
+ "fit_A3_s": 95.9,
+ "total_s": 100.5,
+ "note": "data-to-weight conversion speeds: 896-weight ridge readout 0.44s; 13/14-feature IRLS heads 0.5-0.8s; 921-feature head 89.1s (fit loop) - all closed-form, no gradients"
+}

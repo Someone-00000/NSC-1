@@ -1,0 +1,62 @@
+{
+  "version": "kgat_v6_dva",
+  "date": "2026-11-24",
+  "frozen_before_any_test_eval": true,
+  "user_theory": "Before WSPL we used the model's own vectors and turned them into data (the compiled memory library). The question now: instead of compiling MORE weights from more data, what happens when we take the genius weights we already made and directly give them access to the vectors - a direct readout from the frozen 896-d memory space into the selector, with zero new data, zero gradients?",
+  "experiment_name": "DVA - Direct Vector Access",
+  "recovery_disclosure": "The KGAT rung scripts were lost in a sandbox recycle; all science state survived (download/wspl_kgat_v{2..5}_state_*.json, heads, preregs) and the full record is on GitHub NSC-1. v6 therefore runs on the FROZEN v4 state files - the candidate pools, features and labels are bit-identical to v4's; nothing is regenerated. T2 pool mapping recovered and verified: T2-full = 572 items where float(answer) parses as integer (any sign), pool order, golds match state 572/572; T2-v1 = 56/56.",
+  "design_note": "v4's selector reads 13 hand-engineered compressions of the memory pull. DVA keeps every v4 component byte-identical and adds channels that read the frozen 896-d Qwen2.5-0.5B last-token vectors DIRECTLY, compiled closed-form from the same 1000-item memory. Same data, same rows, same labels - only the access path to the vectors changes. This is the fastest data-to-weight conversion the program has: one closed-form solve per readout.",
+  "data_unchanged_frozen": {
+    "train_rows": "download/wspl_kgat_v4_state_train.json (44,243 rows, 373 positives, labels list, LOO-adjusted generation as frozen in v4)",
+    "test_rows": "download/wspl_kgat_v4_state_test.json (1319 items)",
+    "hle_rows": "download/wspl_kgat_v4_state_hle.json (records_t2full 572, records_t2v1 56)",
+    "vectors": "realbench_cache/embeddings/emb_gsm_train.npy (1000x896), emb_gsm_test_full.npy (1319x896), emb_hle_full.npy (2370x896), emb_hle.npy (200x896); fp32 frozen",
+    "memory_golds": "scripts/realbench/prereg.json stages.gsm_train.labels (frozen indices + labels, n=1000)",
+    "no_new_data": true,
+    "no_test_labels_during_build": "DVA features for test/HLE rows are computed from question vectors + train-side memory only; test golds are touched once, in the final frozen eval"
+  },
+  "arms_frozen": {
+    "C0_control_head": "Exact refit of the v4 13-feature IRLS head on the same rows under the frozen v4 protocol. Purpose: integrity gate + comparison anchor (must reproduce the v4 head artifact and v4 reported strict).",
+    "A1_ridge_readout": "13 v4 features + d1_ridge (14 features). d1_ridge: compile a ridge numeric readout W from the 1000 frozen memory vectors to their golds (the v0 recipe, verbatim: standardize on the 1000 rows, lambda grid [0.001,0.01,0.1,1,10,100], val split rng np.random.default_rng(20261122) last 20%, val RMSE selection, refit on all 1000, prediction clip [0,10000] as in v0). Feature d1 = exp(-|log10(v+1) - log10(clip(pred,0,10000)+1)|). The vector readout predicts the item's answer magnitude from its raw 896-d vector in ONE closed-form solve.",
+    "A2_neighbor_profile": "13 v4 features + 11 neighbor-profile features (24 total). kNN-10 recomputed for every item: cosine on L2-normalized frozen embeddings, k=10, np.argsort(-sims, kind='stable') deterministic; train items exclude self (v4 LOO policy a). Features d2_j = 1.0 if |round(v)-round(g_j)| < 1e-6 else 0.0 for each of the 10 neighbor golds g_j, plus d2_sum = mean(d2_j). Element-wise access to the pulled memory content; v4's f8 aggregated this same pull into a band check.",
+    "A3_full_dva": "13 + d1_ridge + 11 neighbor-profile + 896 interaction dims = 921 features. Interaction dim d3_k = qstd_k * log10(v+1), where qstd = the item's standardized 896-d vector (ridge readout's mu/sd). The maximal direct-vector arm: a per-dimension readout of how each semantic direction of the question vector modulates candidate magnitude."
+  },
+  "loo_disclosure_frozen": {
+    "ridge_readout_train_predictions": "exact ridge LOO via the hat-matrix identity pred_LOO_i = (pred_full_i - h_ii * y_i) / (1 - h_ii), h_ii = x_i^T (Xs^T Xs + lambda I)^{-1} x_i on the standardized rows, computed from one eigendecomposition; standardization stats are full-data (fixed smoother, disclosed; O(1/n) offset)",
+    "knn_train": "self excluded from own neighbor set",
+    "dva_features_touch_no_labels_of_their_own_item": true
+  },
+  "fit_protocol_frozen": "identical to v4: IRLS Newton on mean weighted log-loss + L2, max 25 iterations, grad/step tol 1e-8, logit clip [-30,30], step clip max|delta|<=5, bias unregularized; per-item class weighting (positives weight n_neg/n_pos, negatives 1.0); lambda grid [0.01,0.1,1,10,100]; item split rng np.random.default_rng(20261124) permutation of the 1000 items, first 800 fit, last 200 select; selection metric = top-1 realized accuracy on the 200 (tie-break: accuracy among gold-present items, then smaller lambda); final refit on all 1000 items with the chosen lambda; S1 selector = argmax head logit over saved candidates, ties first in stored rank order. No other selector is preregistered for DVA arms (no garden of forking paths).",
+  "success_criteria_frozen": {
+    "primary_gsm8k_full_strict_S1": "best of A1/A2/A3: PASS if acc >= 0.040; PARTIAL if > 0.031842 (v4 S1); HONEST NEGATIVE if <= 0.031842; any upgrade claim must additionally beat v5 S1 0.032600 (v5 ablation-A 0.037149 disclosed as context, not a criterion)",
+    "realized_ratio_check": "acc_when_gold_present >= 0.159 (2x v4's 0.0797) OR top5 >= 0.218 (2x v4's 0.1092)",
+    "hle_transfer": "all arms transferred zero-shot and reported (no selection): improvement if any arm > 0.020979 on T2-full (v4 f1-only, best prior) or > 0.0 on T2-v1",
+    "compile_speed_metric_wspl_goal": "data-to-weights compile time (seconds) measured for every readout and head; the fastest conversion is itself a reported result",
+    "stability_metric_wspl_goal": "each head compiled twice must be bit-identical (max abs weight diff == 0.0); LOO-to-full weight shift (L2) of the ridge readout reported",
+    "reporting_rule": "whichever outcome occurs, real numbers are reported; no post-hoc criterion changes; single final eval per arm per suite"
+  },
+  "integrity_gates": {
+    "GATE-0_data": "state_train record golds == prereg gsm_train labels 1000/1000; rows 44,243; positives 373; state_test n=1319; state golds consistent with test item files (alignment only)",
+    "GATE-1_knn_reconstruction": "recomputed top-10 neighbor golds reproduce stored f8 (band indicator [q10,q90]) on >= 99% of test rows AND stored f7 (log-median band prior) on >= 99% of test rows; exact rate disclosed",
+    "GATE-2_head_refit": "C0 refit weights match download/wspl_kgat_v4_head.json within 5e-7 element-wise (artifact stored 6dp) and C0 S1 strict on state_test == 42/1319 = 0.031842 bit-consistent; if the refit fails, HALT and fix the reconstruction before any DVA number is reported",
+    "GATE-3_v3_control": "mean(ok_strict) == 0.014404852160727824 and mean(ok_loose) == 0.02577710386656558 on state_test, and the consensus field agrees with ok_strict per record",
+    "GATE-4_frozen_state": "candidate row values and features are read-only from the state files; checksums of inputs recorded in results"
+  },
+  "hypotheses_frozen": [
+    "H1_signal: the 13-feature compression destroys information the vector space still carries; at least one DVA arm beats C0 strict (direction only - either outcome is informative)",
+    "H2_sufficiency: with 373 positives and no gradients, the compression IS the right inductive bias; DVA arms land at or below C0 and overfitting shows as val-select gap growth with feature count - then the big run's lever is data volume into weights, not feature access"
+  ],
+  "baselines": {
+    "v4_S1_strict": 0.031842, "v4_S1_acc_when_gold_present": 0.079696, "v4_S1_top5": 0.109174, "v4_S1_top10": 0.18044,
+    "v4_f1only_strict": 0.025777, "v4_fused_strict": 0.025019,
+    "v5_S1_strict": 0.032600, "v5_ablationA_S1_strict": 0.037149,
+    "v3_strict": 0.014404852160727824, "v3_oracle": 0.3995451099317665,
+    "hle_t2full_v4_f1only": 0.020979, "hle_t2full_v4_ft": 0.010490, "hle_t2v1_v4": 0.0
+  },
+  "run_integrity": {
+    "wall_budget": "foreground slices, no background processes; every compile inside seconds",
+    "states_read": ["download/wspl_kgat_v4_state_train.json", "download/wspl_kgat_v4_state_test.json", "download/wspl_kgat_v4_state_hle.json"],
+    "outputs": ["download/wspl_kgat_v6_dva_results.json", "download/wspl_kgat_v6_dva_head_C0.json", "download/wspl_kgat_v6_dva_head_A1.json", "download/wspl_kgat_v6_dva_head_A2.json", "download/wspl_kgat_v6_dva_head_A3.json", "download/wspl_kgat_v6_dva_times.json"],
+    "record_push": "results to GitHub NSC-1 after eval, per tracking discipline"
+  }
+}

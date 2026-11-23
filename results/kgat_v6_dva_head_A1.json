@@ -1,0 +1,28 @@
+{
+ "artifact": "kgat_v6_dva A1 compiled head (IRLS, no backprop) - 13 v4 features + ridge vector readout channel",
+ "arm": "A1",
+ "d": 14,
+ "lambda": 0.01,
+ "w": [
+  0.2335484118212996,
+  -0.5085137463223833,
+  0.9804588549726853,
+  0.023916619165436515,
+  0.4768198182936079,
+  -0.024611830902473382,
+  1.7878717452190744,
+  -0.07556519030649965,
+  1.1009677625202217,
+  -0.1261754285618273,
+  -0.27604650570306005,
+  0.10681399503215942,
+  -1.5153841642804626,
+  0.06399611515989632
+ ],
+ "b": -1.3590163844037382,
+ "d1_weight_note": "the direct vector readout channel compiles to w=0.0640 - real but too weak to flip any test selection",
+ "val200_acc_all": 0.037037037037037035,
+ "val200_acc_gp": 0.09859154929577464,
+ "fit_s": 0.61,
+ "stability_maxdiff": 0.0
+}
