@@ -1,0 +1,124 @@
+{
+ "GSM8K_full_forensics": {
+  "copy_first_number_acc": 0.016679302501895376,
+  "mean_chains_per_item": 14.184988627748295,
+  "mean_consensus_sigs": 6.4674674674674675,
+  "mean_drafts_per_item": 570.2122820318423,
+  "mean_valid_per_item": 333.71872630780894
+ },
+ "GSM8K_full_numeric": {
+  "acc_loose": 0.03335860500379075,
+  "acc_strict": 0.019711902956785442,
+  "acc_when_consensus": 0.026026026026026026,
+  "consensus_rate": 0.7573919636087946,
+  "coverage_any_valid_draft": 0.9476876421531463,
+  "n": 1319
+ },
+ "HLE_T2_full_pool": {
+  "acc_loose": 0.005244755244755245,
+  "acc_strict": 0.015734265734265736,
+  "acc_when_consensus": 0.028125,
+  "consensus_rate": 0.5594405594405595,
+  "coverage_any_valid_draft": 0.6835664335664335,
+  "n": 572,
+  "rule": "same frozen T2 rule (gold parses as int) on full 2370-item pool"
+ },
+ "HLE_v1_T2": {
+  "acc_loose": 0.0,
+  "acc_strict": 0.0,
+  "acc_when_consensus": 0.0,
+  "consensus_rate": 0.4107142857142857,
+  "coverage_any_valid_draft": 0.5,
+  "n": 56
+ },
+ "ablations_GSM8K_full": {
+  "genius_only_w1_0": {
+   "acc_loose": 0.025018953752843062,
+   "acc_strict": 0.016679302501895376,
+   "acc_when_consensus": 0.022022022022022022,
+   "consensus_rate": 0.7573919636087946,
+   "coverage_any_valid_draft": 0.9476876421531463,
+   "n": 1319
+  },
+  "mem_only_w1_0": {
+   "acc_loose": 0.030326004548900682,
+   "acc_strict": 0.02122820318423048,
+   "acc_when_consensus": 0.028028028028028028,
+   "consensus_rate": 0.7573919636087946,
+   "coverage_any_valid_draft": 0.9476876421531463,
+   "n": 1319
+  }
+ },
+ "build_times_s": {
+  "compile": 0.12,
+  "eval_gsm": 9.46,
+  "mine": 0.02
+ },
+ "compiled_components": {
+  "grammar_gate_train_side": {
+   "accept_threshold": 0.43,
+   "accepted": false,
+   "v1_grammar_coverage_cap256": 0.3886,
+   "v2_grammar_coverage_cap256": 0.3868
+  },
+  "op_transition_matrix": {
+   "prev_ops": 4,
+   "smoothing": "Laplace alpha=1",
+   "top_pairs": [
+    "*->*:157",
+    "*->+:132",
+    "*->-:79",
+    "*->/:69",
+    "+->-:57",
+    "/->*:56",
+    "+->+:51",
+    "+->*:50"
+   ]
+  },
+  "order_prior_size": 136,
+  "skeleton_classifier": {
+   "estimator": "closed-form fp64 ridge one-hot, zero gradients",
+   "lambda": 1000.0,
+   "n_classes": 24,
+   "train_rows": 561,
+   "val_top3_exact_class": 0.4
+  },
+  "skeleton_magnitude_bands": {
+   "multisets": 34,
+   "rule": "[q10,q90] of train golds, >=5 golds required"
+  },
+  "word_constant_table_v2": {
+   "relaxation": "n>=2 AND n/tot>=0.25 (v1: n>=3 AND >=0.4 -> 32)",
+   "top": "[...60 items dropped in digest; full file kept locally...]",
+   "words_kept": 225
+  }
+ },
+ "frozen_criteria_verdicts": {
+  "ablation_ordering_strict": "mem_only 0.02123 > fused 0.01971 > genius_only 0.01668 - memory pull beats compiled genius transitions; 50/50 fusion dilutes memory",
+  "grammar_gate_train_side": {
+   "verdict": "FAILED (v2 0.3868 vs v1 0.3886, threshold 0.43) - operand recovery, not op grammar, is the ceiling"
+  },
+  "primary_gsm8k_full_strict": {
+   "threshold_partial": 0.0235,
+   "threshold_pass": 0.035,
+   "value": 0.019711902956785442,
+   "verdict": "HONEST NEGATIVE (below v1 strict 0.0235)"
+  },
+  "secondary_hle_t2full_strict": {
+   "v1_value": 0.022727272727272728,
+   "value": 0.015734265734265736,
+   "verdict": "NEGATIVE (below v1)"
+  },
+  "verify_fix_check_acc_when_consensus_gsm": {
+   "v1_value": 0.026204564666103127,
+   "value": 0.026026026026026026,
+   "verdict": "FAILED FIX (no improvement: 0.02603 vs 0.02620)"
+  }
+ },
+ "mechanism_note": "user architecture: model memory = frozen embedding library; genius pattern weights resident in RAM; at each reasoning-token step PULL memory (kNN neighbor chains) + FUSE with compiled genius patterns (transition matrix x classifier compat) -> predict next op; completed chains grounded and executed in parallel; verify vs per-skeleton memory bands + diversity-weighted consensus; consensus-only strict answer",
+ "per_item_gsm": "[...1319 items dropped in digest; full file kept locally...]",
+ "per_item_hle_t2": "[...56 items dropped in digest; full file kept locally...]",
+ "per_item_hle_t2_full": "[...572 items dropped in digest; full file kept locally...]",
+ "run_tag": "kgat_v2_genius_ram",
+ "version": "kgat_v2_genius_ram"
+}

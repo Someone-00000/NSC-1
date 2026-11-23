@@ -1,0 +1,81 @@
+{
+ "GSM8K_full_forensics": {
+  "copy_first_number_acc": 0.016679302501895376,
+  "mean_drafts_per_item": 621.0083396512509,
+  "mean_valid_per_item": 358.8483699772555
+ },
+ "GSM8K_full_numeric": {
+  "acc_loose": 0.0401819560272934,
+  "acc_strict": 0.02350265352539803,
+  "acc_when_consensus": 0.026204564666103127,
+  "consensus_rate": 0.8968915845337376,
+  "coverage_any_valid_draft": 0.9150871872630781,
+  "n": 1319
+ },
+ "HLE_T2_full_pool": {
+  "acc_loose": 0.026223776223776224,
+  "acc_strict": 0.022727272727272728,
+  "acc_when_consensus": 0.037463976945244955,
+  "consensus_rate": 0.6066433566433567,
+  "coverage_any_valid_draft": 0.6118881118881119,
+  "n": 572,
+  "rule": "same frozen T2 rule (gold parses as int) on full 2370-item pool"
+ },
+ "HLE_v1_T2": {
+  "acc_loose": 0.017857142857142856,
+  "acc_strict": 0.0,
+  "acc_when_consensus": 0.0,
+  "consensus_rate": 0.4642857142857143,
+  "coverage_any_valid_draft": 0.48214285714285715,
+  "n": 56
+ },
+ "build_times_s": {
+  "compile": 0.27,
+  "eval_gsm": 0.0,
+  "mine": 0.02
+ },
+ "compiled_components": {
+  "answer_band_recall": "kNN-5 over 1000-item answer memory (v0-style)",
+  "order_prior_size": 136,
+  "skeleton_classifier": {
+   "classes_top12": [
+    "**",
+    "*+",
+    "*-",
+    "**+",
+    "*/",
+    "*",
+    "+*",
+    "++",
+    "/",
+    "/*",
+    "+-",
+    "+/"
+   ],
+   "estimator": "closed-form fp64 ridge one-hot, zero gradients",
+   "lambda": 100.0,
+   "n_classes": 24,
+   "train_rows": 561,
+   "val_diag_note": "out-of-fold (head fit on train slice only)",
+   "val_multiset_recall": {
+    "cls_top3_multiset": 0.2857142857142857,
+    "knn5_multiset": 0.29464285714285715,
+    "n_val": 112,
+    "union_multiset": 0.4017857142857143
+   },
+   "val_top3_exact_class": 0.37142857142857144
+  },
+  "skeleton_recall": "kNN-5 over 561 skeleton-bearing train rows (cosine, standardized)",
+  "train_side_grammar_diagnostics": {
+   "gold_skeleton_operand_coverage_cap256": 0.33,
+   "grammar_ceiling_nonrecoverable_literals": "1105/2940"
+  },
+  "word_constant_table_top": "[...32 items dropped in digest; full file kept locally...]"
+ },
+ "mechanism_note": "user theory instantiated: M_mine genius traces -> C_compile logic into weights -> D_draft all programs in one parallel pass (no autoregression) -> V_verify vs memory + self-consistency -> A_answer",
+ "per_item_gsm": "[...1319 items dropped in digest; full file kept locally...]",
+ "per_item_hle_t2": "[...56 items dropped in digest; full file kept locally...]",
+ "per_item_hle_t2_full": "[...572 items dropped in digest; full file kept locally...]",
+ "run_tag": "kgat_v1_making",
+ "version": "kgat_v1"
+}

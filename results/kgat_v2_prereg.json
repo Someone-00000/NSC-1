@@ -1,0 +1,78 @@
+{
+  "version": "kgat_v2_genius_ram",
+  "date": "2026-11-23",
+  "author_note": "User architecture instantiated: one trained model (Qwen2.5-0.5B compiled embeddings) = MEMORY; PBCS genius thinking patterns = RAM-resident compiled weights; at each reasoning-token prediction the system PULLS memory (kNN neighbor chains) and FUSES it with its own genius patterns (transition matrix + skeleton classifier) to predict the next token, then verifies against memory. v1's measured limits are attacked directly: (a) 33% grammar ceiling -> expanded operands + relaxed word-constant table with a train-side acceptance gate; (b) verify bottleneck (89.7% consensus fire, 2.6% precision) -> diversity-weighted consensus with distinct-signature support + source-confidence vote weights + per-skeleton magnitude bands.",
+  "frozen_before_any_test_eval": true,
+  "mechanism_mapping_to_user_architecture": {
+    "model_memory": "frozen embedding library of 1000 solved problems (+ their mined reasoning chains, + answers), resident in RAM as fp64 arrays; pull = cosine kNN",
+    "genius_pattern_weights_ram": "compiled closed-form components listed under genius_ram_weights; zero gradients",
+    "token_prediction_loop": "iterative beam over reasoning-chain prefixes; each step scores candidate next-ops by fused(memory_pull, genius_pattern); completed chains are grounded and executed in parallel (no autoregression over surface text)",
+    "verify_then_answer": "verify stage vs memory bands + diversity-weighted self-consistency; consensus-only strict answer"
+  },
+  "data": {
+    "train": "gsm8k train subset frozen in scripts/realbench/prereg.json (indices, n=1000); embeddings emb_gsm_train.npy",
+    "eval_gsm": "GSM8K test full 1319 (items_gsm_test_full.json + emb_gsm_test_full.npy)",
+    "eval_hle": "HLE full pool 2370; T2-full = gold parses as positive integer under the same frozen v1 rule -> 572 rows (items_hle_full.json + emb_hle_full.npy)",
+    "no_test_labels_touched_during_build": true
+  },
+  "mining_rules": {
+    "genius_traces": "identical to v1: calculator annotations <<expr=res>> from the 1000 solved problems; single-op-per-annotation chains of length 1..4; v1 measured 561/1000 clean",
+    "chain_used_for": "memory pull source + transition matrix + seed distribution + per-skeleton magnitude bands"
+  },
+  "genius_ram_weights": {
+    "1_skeleton_classifier": "identical recipe to v1 amendment v1.2: closed-form fp64 ridge one-hot over top-24 ordered skeleton classes, lambda grid on train-val top-3 exact-class accuracy, plus kNN-5 skeleton recall; candidate multisets = union of classifier top-3 + kNN-5 neighbor chains, capped at 8",
+    "2_word_constant_table_v2": "relaxed vs v1 (v1: n>=3 AND n/tot>=0.4 -> 32 words): keep word->constant if n>=2 AND n/tot>=0.25; inject up to TOP8 constants (by support) whose word occurs in the question (v1: top4); text numbers capped at 12 (v1: 8)",
+    "3_op_transition_matrix": "P(next_op | prev_op) and P(first_op) mined from the 561 chains (Laplace-smoothed, alpha=1) - the compiled 'how geniuses continue a chain' weight",
+    "4_skeleton_magnitude_bands": "for each top-24 skeleton class: [q10, q90] of train golds bearing it; fallback = kNN-5 answer band [min/10, max*10] (v1 rule)",
+    "5_order_prior": "skeleton frequency over mined chains (v1)"
+  },
+  "token_loop_rules": {
+    "beam": "breadth B=16 prefixes per depth, depth 1..4 ops, prefixes must stay compatible with at least one candidate multiset (op counts bounded, completion = counts exactly match a candidate multiset)",
+    "fusion_score": "score(op at position t | prefix) = 0.5*mem + 0.5*genius (weights frozen 50/50, no test tuning)",
+    "mem_pull": "over kNN-10 neighbors (cosine on raw normalized embeddings): weighted fraction of neighbors whose chain has op o at position t (neighbors without chains contribute zero mass); if no neighbor reaches position t, mem pull is zero-mass and genius dominates that step",
+    "genius_pull": "product of (transition P(o|prev) or seed P(o)) and classifier_compat = fraction of classifier softmax mass on top-24 classes whose op counts can still absorb prefix+o",
+    "grounding_per_chain": "v1 grounding search restricted to the chain's ordered ops: operands = 12 text numbers + up to 8 injected constants; intermediates single-use; cap 64 groundings per chain; total cap 1024 drafts/item; text-number-first ranking (v1 key)",
+    "dedup": "prefix dedup by op tuple; draft dedup by (chain, sorted operand instances used)"
+  },
+  "verify_rules_v2": {
+    "integer_rule": "|x - round(x)| < 1e-6 and x > 0 (v1 rule, unchanged)",
+    "magnitude_band": "per-chain-skeleton [q10,q90] if skeleton in bands, else kNN-5 band [min/10, max*10]; out-of-band drafts demoted below in-band ones (v1 rule, per-skeleton upgrade)",
+    "vote_weight": "source confidence: classifier softmax prob of the class that seeded the chain, or neighbor cosine for kNN-seeded chains; multiplied by 1.0",
+    "consensus": "support of a value = number of DISTINCT (chain, operand-signature) pairs reaching it; consensus requires distinct-signature support >= 2 (replaces v1's raw count>=2 which fired at 89.7% with 2.6% precision); tie by total weight, then first rank",
+    "strict": "consensus value else WRONG (abstain counts as wrong)",
+    "loose": "no consensus -> highest-weight valid draft (diagnostic only)"
+  },
+  "grammar_expansion_gate_train_side_only": {
+    "metric": "gold-skeleton operand coverage with cap 256 groundings (v1 measured 0.330 under v1 grammar)",
+    "acceptance": "expansion accepted iff v2-grammar coverage >= 0.43 (v1 0.330 + 0.10); if gate fails, eval proceeds with v2 grammar anyway but the gate result is reported honestly in build_times/diagnostics",
+    "note": "gate is measured on TRAIN rows with GOLD skeletons only; no test involvement"
+  },
+  "success_criteria_frozen": {
+    "primary_gsm8k_full_strict": "PASS if acc_strict >= 0.035 (approaching v1 loose 0.0402); PARTIAL if > 0.0235 (v1 strict); HONEST NEGATIVE if <= 0.0235",
+    "secondary_hle_t2full_strict": "improve over v1 acc_strict 0.02273",
+    "verify_fix_check": "acc_when_consensus on GSM8K full must exceed v1's 0.02620 (else the diversity-consensus change is reported as a failed fix)",
+    "reporting_rule": "whichever outcome occurs, real numbers are reported; no post-hoc criterion changes"
+  },
+  "baselines_same_tasks_from": "download/wspl_kgat_v1_results.json and download/wspl_kgat_v0_results.json",
+  "baselines_gsm8k_full": {
+    "v1_strict": 0.02350265352539803,
+    "v1_loose": 0.0401819560272934,
+    "v1_acc_when_consensus": 0.026204564666103127,
+    "v0_kgat_strict": 0.0,
+    "recall_knn_median": 0.01061410159211524
+  },
+  "baselines_hle_t2full": {
+    "v1_strict": 0.022727272727272728,
+    "v1_loose": 0.026223776223776224,
+    "v0_kgat_strict": 0.0
+  },
+  "ablations_preregistered_gsm_only": [
+    "w_mem=1.0 w_genius=0.0 (memory-only token loop)",
+    "w_mem=0.0 w_genius=1.0 (genius-only token loop)"
+  ],
+  "run_integrity": {
+    "wall_budget": "foreground 460s slices, checkpoint/resume via state files, no background processes",
+    "states": "download/wspl_kgat_v2_state_gsm.json, download/wspl_kgat_v2_state_hle.json",
+    "results": "download/wspl_kgat_v2_results.json"
+  }
+}

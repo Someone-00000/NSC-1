@@ -1,0 +1,127 @@
+{
+ "GSM8K_full_numeric": {
+  "acc_loose": 0.02577710386656558,
+  "acc_strict": 0.014404852160727824,
+  "acc_when_consensus": 0.01940755873340143,
+  "consensus_rate": 0.7422289613343442,
+  "coverage_any_valid_draft": 0.9567854435178166,
+  "n": 1319,
+  "oracle_gold_in_valid": 0.3995451099317665,
+  "selector_gold_in_top5": 0.10841546626231995
+ },
+ "HLE_T2_full_pool": {
+  "acc_loose": 0.02097902097902098,
+  "acc_strict": 0.017482517482517484,
+  "acc_when_consensus": 0.03058103975535168,
+  "consensus_rate": 0.5716783216783217,
+  "coverage_any_valid_draft": 0.7097902097902098,
+  "n": 572,
+  "oracle_gold_in_valid": 0.17132867132867133,
+  "rule": "same frozen T2 rule (gold parses as int)",
+  "selector_gold_in_top5": 0.08741258741258741
+ },
+ "HLE_v1_T2": {
+  "acc_loose": 0.0,
+  "acc_strict": 0.0,
+  "acc_when_consensus": 0.0,
+  "consensus_rate": 0.42857142857142855,
+  "coverage_any_valid_draft": 0.5535714285714286,
+  "n": 56,
+  "oracle_gold_in_valid": 0.125,
+  "selector_gold_in_top5": 0.05357142857142857
+ },
+ "ablations_GSM8K_full": {
+  "genius_only_w1_0": {
+   "acc_loose": 0.025018953752843062,
+   "acc_strict": 0.013646702047005308,
+   "acc_when_consensus": 0.018386108273748723,
+   "consensus_rate": 0.7422289613343442,
+   "coverage_any_valid_draft": 0.9567854435178166,
+   "n": 1319,
+   "oracle_gold_in_valid": 0.40333586050037906,
+   "selector_gold_in_top5": 0.1106899166034875
+  },
+  "mem_only_w1_0": {
+   "acc_loose": 0.021986353297952996,
+   "acc_strict": 0.013646702047005308,
+   "acc_when_consensus": 0.01834862385321101,
+   "consensus_rate": 0.7437452615617892,
+   "coverage_any_valid_draft": 0.9567854435178166,
+   "n": 1319,
+   "oracle_gold_in_valid": 0.41698256254738436,
+   "selector_gold_in_top5": 0.11144806671721001
+  }
+ },
+ "build_times_s": {
+  "compile": 0.18,
+  "eval_gsm": 0.0,
+  "mine": 0.05
+ },
+ "compiled_components": {
+  "fine_level_genius_weights": {
+   "op_magnitude_bands": {
+    "*": [
+     -2.526,
+     4.103
+    ],
+    "+": [
+     -1.099,
+     1.792
+    ],
+    "-": [
+     0.203,
+     2.197
+    ],
+    "/": [
+     1.099,
+     4.767
+    ]
+   },
+   "role_buckets_per_step": {
+    "0": 7,
+    "1": 8,
+    "2": 9,
+    "3": 7
+   },
+   "word_constant_table_words": 227
+  },
+  "skeleton_classifier": {
+   "lambda": 1000.0,
+   "n_classes": 24,
+   "train_rows": 560,
+   "val_top3_exact_class": 0.36764705882352944
+  },
+  "skeleton_magnitude_bands": {
+   "multisets": 34
+  }
+ },
+ "frozen_criteria_verdicts": {
+  "ablation_note": "mem_only and genius_only strict identical (0.01365); fusion 0.01440 marginally above both, all below v1",
+  "build_time_note": "mine 0.05s compile 0.18s; eval wall-time instrumentation recorded 0.0 due to an intermediate edit-state glitch - full eval = 4,066 item-runs (1319 GSM + 572 HLE-T2full + 56 HLE-T2 + 2x1319 ablations) completed within one 500s foreground slice",
+  "oracle_finding": {
+   "gold_in_top5_gsm": 0.10841546626231995,
+   "gold_in_valid_gsm": 0.3995451099317665,
+   "note": "GENERATION reaches 39.95% oracle on GSM8K (gold inside the one-pass candidate set) but the selector realizes only 1.44% strict / 2.58% loose / 10.84% top-5 -> bottleneck cleanly measured as SELECTION, not generation"
+  },
+  "primary_gsm8k_full_strict": {
+   "value": 0.014404852160727824,
+   "verdict": "HONEST NEGATIVE (0.01440 <= v2 0.01971 <= v1 0.02350)"
+  },
+  "secondary_hle_t2full_strict": {
+   "value": 0.017482517482517484,
+   "verdict": "NEGATIVE vs v1 (0.01748 < 0.02273) but ABOVE v2 (0.01573)"
+  },
+  "selection_upgrade_check": {
+   "loose": 0.02577710386656558,
+   "verdict": "FAILED (loose 0.02578 < v2 0.03336; acc_when_consensus 0.01941 < v1 0.02620)"
+  },
+  "v2_index_bug_disclosure": "v2 candidate_multisets indexed standardized-space sims (560 program rows) with raw train-row indices -> kNN-sourced skeleton candidates were silently scrambled in v2; v1 indexed consistently (unaffected); v3 fixed. v2 reported numbers stand as measurements of that recipe as-run."
+ },
+ "mechanism_note": "NCM mapping: level0 skeleton concepts in parallel -> level1 orderings -> level2 operand moves scored by fused memory pull + genius fine-level weights -> all candidates in one pass -> selector reasons over the answer set (rank-normalized weights, per-skeleton bands); fixes v2: genius at grounding level, rank-normalized vote weights, v1 grounding depth restored",
+ "ncm_reference": "Next-Concept Modeling (NCM), Stanford Hazy Research 2026-10-12 (Kumbong, Khare, Arora, Mirhoseini, Re), arXiv 2610.14162: text as a coarse-to-fine hierarchy of discrete codes; generation proceeds level by level, predicting ALL codes within each level in parallel; few parallel steps instead of autoregression",
+ "per_item_gsm": "[...1319 items dropped in digest; full file kept locally...]",
+ "per_item_hle_t2": "[...56 items dropped in digest; full file kept locally...]",
+ "per_item_hle_t2_full": "[...572 items dropped in digest; full file kept locally...]",
+ "run_tag": "kgat_v3_ncm_pbcs",
+ "version": "kgat_v3_ncm_pbcs"
+}
