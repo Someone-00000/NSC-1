@@ -20,7 +20,7 @@
    "f8_match": 61449,
    "f8_total": 61449,
    "f8_rate": 1.0,
-   "result": "PASS (recomputed kNN-10 reproduces stored v3/v4 band features at 100%)
+   "result": "PASS (recomputed kNN-10 reproduces stored v3/v4 band features at 100%: 61449/61449 rows)"
   },
   "GATE-2": {
    "convention": "P1 (mean-form Hessian, L2 not divided by weight sum; reconstructed)",
