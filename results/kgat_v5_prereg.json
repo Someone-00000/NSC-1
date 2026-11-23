@@ -1,0 +1,70 @@
+{
+  "version": "kgat_v5_genius_ft",
+  "date": "2026-11-23",
+  "frozen_before_any_test_eval": true,
+  "user_theory": "We already turned the genius thinking way into weights (v1-v3 PBCS artifacts: skeleton classifier, role priors, op log-ratio bands, per-multiset answer bands, order prior, word->constant table). Since we already hold those weights, the next WSPL step is to TRAIN THEM: fine-tune the compiled genius weight artifacts directly, in weight space, staying with our goal of directly working with weights instead of using ML. Measure what fine-tuning the genius weights buys on the oracle-vs-selected gap this time.",
+  "wspl_ladder": {
+    "v0": "data->weights: solved-problem embedding memory (ridge+prototype+kNN consensus)",
+    "v1": "genius reasoning chains compiled into priors (making)",
+    "v2": "Genius-RAM: 4 genius weight artifacts + memory pull",
+    "v3": "NCM-PBCS: parallel coarse-to-fine generation, oracle 39.95% but selector 1.44% (selection wall found)",
+    "v4": "fine-tuning compiled into a 13-feature IRLS selector head (3.18% strict, 2.21x v3, ~8% of oracle realized)",
+    "v5": "THIS RUN: fine-tune the genius weight artifacts themselves (FT-A/B/C closed-form weight-space updates), NCM generation kept, v4 head protocol refitted on regenerated candidates"
+  },
+  "genius_ft_spec": {
+    "no_gradient": "every update is closed-form (weighted ridge, weighted counts, weighted quantiles) - fine-tuning as direct weight replacement; no backprop, no optimizer loop",
+    "signal": "leak-free generative-correctness from the v3-identical LOO pipeline on the 1000 mined train items: per item, tried multisets (candidate skeleton multisets actually generated) and delivered multisets/orders (those through which a valid candidate equal to gold was produced)",
+    "kappa": 1.0,
+    "classifier_lambda": 1000.0,
+    "classifier_lambda_note": "frozen = v3's selected lambda (baselines.v3_head_compile.lambda), not re-tuned",
+    "FT_A_skeleton_weights": "classifier refit W' = argmin sum_k d_k (y_k - x_k W)^2 + lambda||W||^2 with d_k = 1 + kappa*rel(ms_k), rel(m) = (delivered_m + 1)/(tried_m + 2) (Laplace-smoothed per-multiset delivery reliability); order prior updated: mining counts + kappa*delivered-order counts",
+    "FT_B_operand_weights": "role (operand-kind/position) counts and per-op operand log-ratio bands [q10,q90] re-fit with row weights d_k (weighted quantiles)",
+    "FT_C_value_weights": "per-multiset answer bands re-anchored to golds of train items that DELIVERED through that multiset (requires n_delivered >= 5, else keep v3 band); word->constant table counts reweighted by d_r with the unchanged v3 rule (top mass >= 2 and >= 0.25 of total weighted mass)",
+    "loo_discipline": "every LOO pack excludes the item's own mining row AND its own delivery/tried events (rel' recomputed per item); non-mined items exclude only their delivery events",
+    "head": "v4 protocol byte-identical: 13 features + bias recomputed under the fine-tuned artifacts, IRLS closed-form Newton, lambda grid [0.01,0.1,1,10,100] selected on 200-item val split (seed 20261124, 800/200)",
+    "arms": {
+      "S1_v5_ft": "FT-A+B+C applied, full 13-feature head argmax",
+      "S2_v5_ft_f1only": "same artifacts, score-only (f1+bias) head - HLE transfer arm",
+      "S3_v5_fused": "S1 head rank-fused 50/50 with v3 consensus score",
+      "secondary_if_wall": "ablations A-only, C-only, B-only (GSM only, each with own LOO head refit)"
+    }
+  },
+  "generation_frozen": "NCM-PBCS one-pass generation byte-identical to v3/v4 (parallel skeleton concepts -> orderings -> genius+memory scored groundings -> one-pass candidates); only the weight artifacts underneath change",
+  "baselines": {
+    "v1_strict_gsm": 0.02350265352539803,
+    "v2_strict_gsm": 0.019711902956785442,
+    "v3_strict_gsm": 0.014404852160727824,
+    "v3_loose_gsm": 0.02577710386656558,
+    "v3_oracle_gsm": 0.3995451099317665,
+    "v4_strict_gsm": 0.03184230477634572,
+    "v4_when_gold_present": 0.07969639468690702,
+    "v4_top5": 0.10917361637604246,
+    "v4_top10": 0.18043972706595907,
+    "v4_oracle_gsm": 0.3995451099317665,
+    "hle_t2full_v3_strict": 0.017482517482517484,
+    "hle_t2full_v4_ft": 0.01048951048951049,
+    "hle_t2full_v4_f1only": 0.02097902097902098,
+    "hle_t2full_oracle": 0.17132867132867133,
+    "hle_v1_t2_all_zero": true
+  },
+  "integrity_gates": [
+    "GATE-1: signal pass must reproduce v4's LOO train records bit-exactly (cands arrays + ok_strict/ok_loose/oracle/consensus) on the first 25 items; any mismatch aborts before any FT artifact is built",
+    "GATE-2: v3-control for test = v4 state_test records (v3-identical generation, live bit-reproducibility verified after v4); recomputed control strict/loose must equal v3 reported exactly (< 1e-12) before any v5 number is reported",
+    "GATE-3: all FT artifacts order-deterministic (sorted keys); artifact disclosure file with rel table + change counts saved before test generation",
+    "GATE-4: per-stage timers recorded; any timer recording 0.0 is annotated (v3 lesson)",
+    "GATE-5: wall budget 460s foreground slices, checkpoint/resume via state files, no background processes"
+  ],
+  "designed_risks_preregistered": [
+    "delivery-reliability feedback could reduce skeleton diversity and LOWER oracle (measured, not assumed)",
+    "delivered-anchored bands could overfit the thin correctness signal (mitigated: n_delivered >= 5 floor with keep-v3 fallback)",
+    "HLE zero-shot transfer of the 13-feature head failed in v4; S2 (score-only) is the preregistered transfer arm"
+  ],
+  "success_criteria_frozen": {
+    "primary_gsm8k_full_strict": "on the best preregistered arm (S1/S2/S3): PASS if acc >= 0.040; PARTIAL if > 0.031842 (v4 strict); HONEST NEGATIVE if <= 0.031842; any upgrade claim additionally requires beating v4",
+    "selection_upgrade_check": "S1 acc_when_gold_present >= 0.100 (v4: 0.0797) OR S1 top10 >= 0.220 (v4: 0.18044)",
+    "generation_check": "S1 oracle_full_inline vs v4 0.399545: improved if >= 0.419545 (+2pp), degraded if <= 0.379545 (-2pp), else report as unchanged",
+    "secondary_hle_t2full": "report vs v4 (full-head 0.010490, f1-only 0.020979); transfer improved if S2 > 0.020979; HLE-v1 report only",
+    "reporting_rule": "whichever outcome occurs, real numbers reported; no post-hoc criterion changes"
+  },
+  "data": "GSM8K train: 1000 preregistered mined indices (scripts/realbench/prereg.json, unchanged); GSM8K test full 1319; HLE T2-full 572 int items of 2370 pool; HLE v1 T2 56; embeddings frozen Qwen2.5-0.5B-Instruct, no gradients anywhere"
+}

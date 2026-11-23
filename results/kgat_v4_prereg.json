@@ -1,0 +1,84 @@
+{
+  "version": "kgat_v4_ft_weights",
+  "date": "2026-11-23",
+  "user_theory": "We have done two compilations: (1) data directly into weights (v0: solved-problem embedding library resident in RAM, pulled by cosine kNN) and (2) genius thinking patterns into weights (PBCS priors) that can directly use the data weights. v3 combined the second NCM concept: coarse-to-fine parallel generation with genius weights at the fine level - massive speed and a 40% oracle on GSM8K, but the selector could not recognize the right answer (1.44% strict). Following the WSPL steps, the next capability to compile is FINE-TUNING ITSELF: turn the fine-tuning adjustment into weights (closed-form fitted selector head, no backprop), keep those weights in RAM alongside the PBCS genius weights, keep the NCM method for generation, and measure whether selection improves this time.",
+  "wspl_ladder": {
+    "v0": "data -> weights (memory)",
+    "v1_v2": "genius thinking patterns -> weights (PBCS priors)",
+    "v3": "NCM one-pass generation fused with genius weights; measured wall = SELECTION (oracle 39.95% vs realized 1.44%)",
+    "v4": "fine-tuning -> weights (IRLS logistic head compiled to 14 numbers) + PBCS genius weights + NCM method"
+  },
+  "frozen_before_any_test_eval": true,
+  "data": {
+    "train": "gsm8k train subset frozen in scripts/realbench/prereg.json (indices, n=1000); same as v0-v3",
+    "eval_gsm": "GSM8K test full 1319",
+    "eval_hle": "HLE full pool 2370; T2-full = gold parses as int -> 572 rows; plus v1 T2 (56)",
+    "no_test_labels_touched_during_build": true,
+    "head_uses_train_only": true
+  },
+  "generation_frozen": "byte-identical to v3 NCM-PBCS: level0 = skeleton concepts (classifier top-3 + kNN-5, <=8, parallel); level1 = orderings ranked by order prior; level2 = operand groundings scored by fused memory pull + genius fine-level weights (0.5/0.5 frozen); caps 128 groundings/chain and 1024 drafts/item; validity filter = positive integers within per-skeleton band or kNN-gold fallback band. No generation ablations in v4 - the comparison isolates the selection upgrade.",
+  "ft_as_weights": {
+    "definition": "fine-tuning = a logistic head over 13 frozen per-candidate features, fitted by IRLS Newton iterations (closed-form linear algebra only: no backprop, no neural network training). The fitted 13 weights + 1 unregularized bias ARE the compiled fine-tuning weights; they are stored in RAM (download/wspl_kgat_v4_head.json) next to the PBCS genius weights and applied at every selection.",
+    "features_frozen": {
+      "f1_score_rn": "rank-normalized (within item, v3 rank_norm, ties by first-encounter) v3 candidate score = sum over drafts reaching the value of chain weight x band factor",
+      "f2_dens": "log1p(n_valid_drafts_reaching_value) / log1p(n_valid_drafts_item)",
+      "f3_sigs": "min(n_distinct_operand_signatures, 5) / 5",
+      "f4_firstrank": "1 - first_valid_rank / n_valid_drafts (first position of the value in the valid draft list)",
+      "f5_max_wsrc": "max per-draft chain weight (rank-normalized per source type x band factor)",
+      "f6_frac_inband": "mean of per-draft band indicators among drafts reaching the value",
+      "f7_mag_soft": "exp(-|log10(v+1) - log10(median gold of top-10 kNN neighbors + 1)|) - memory-pull magnitude prior",
+      "f8_nn_in_band": "1.0 if v within [q10, q90] of top-10 kNN neighbor golds, else 0.2",
+      "f9_in_question": "1.0 if str(int(v)) appears as a standalone digit run in the question text, else 0.0 (provenance prior)",
+      "f10_text_pos": "1 - p/12 where p = first question-number position (0-based, cap 11) matching v, else 0.0",
+      "f11_prov_ratio": "fraction of operand uids in the best draft's signature with uid index < 12 (v3's text-number indexing) over signature length",
+      "f12_src_cls": "1.0 if the best draft's chain came from the classifier source, else 0.0",
+      "f13_len_norm": "best draft's chain length / 4",
+      "bias": "unregularized intercept",
+      "best_draft": "the draft reaching the value with max (chain weight, then earliest rank)"
+    },
+    "loo_policy_for_train_candidates": "For the train item at memory position r, all artifacts that could leak r's own solution are leave-one-out adjusted before its candidates are generated: (a) raw kNN-10 excludes r; (b) r's own chain is excluded from memory-pull neighbor features; (c) the skeleton classifier is exactly refit without r (rank-1 downdate of the Gram system G - x_r x_r^T, same lambda=1000); (d) standardization stats (mu/sd over program rows) recomputed without r; (e) role priors, per-op magnitude bands, per-multiset answer bands, order prior, and the word->constant table have item r's contributions subtracted (role keys retained at zero count; LOO pattern tie-order may differ from the full compile - deterministic). Test and HLE items use the full-data compile exactly as v3 did.",
+    "fit_protocol_frozen": {
+      "rows": "all saved candidates of the 1000 LOO train items (per-item cap 512, ranked by v3 candidate score, ties by value ascending; the cap is part of the frozen v4 protocol and applies identically at train fit and at test/HLE selection)",
+      "label": "1.0 iff candidate value == train gold (absolute diff < 1e-6), else 0.0",
+      "class_weighting": "per item, positives get weight n_neg/n_pos (equal positive/negative mass per item); negatives weight 1.0",
+      "optimizer": "IRLS Newton on mean weighted log-loss + L2, max 25 iterations, grad/step tol 1e-8, logit clip [-30,30], step clip max|delta|<=5, bias unregularized",
+      "lambda_grid": [0.01, 0.1, 1.0, 10.0, 100.0],
+      "item_split": "rng seed 20261124 permutation of the 1000 items; first 800 fit, last 200 select",
+      "selection_metric": "top-1 realized accuracy of the head on the 200 selection items (tie-break: accuracy among gold-present items, then smaller lambda)",
+      "final_fit": "refit on all 1000 items' candidates with the chosen lambda; the selected-lambda metrics on the 200 are reported as honest held-out diagnostics",
+      "ablation_head": "a 1-feature head (f1 score-only + bias) fitted under the identical protocol"
+    },
+    "selectors_frozen": {
+      "S1_v4_ft": "argmax head logit over saved candidates (ties: first in stored score-rank order)",
+      "S2_v4_fused": "argmax of 0.5 * ranknorm(logit) + 0.5 * f1 (frozen 50/50)",
+      "S3_v3_control": "the inline v3 consensus/loose computed on the identical generation; integrity gate: must reproduce v3 GSM8K full strict 0.014405 / loose 0.025777; if not, halt and fix before reporting any v4 number",
+      "S4_v4_ft_f1only": "argmax of the 1-feature head (is the head more than the v3 score?)"
+    },
+    "disclosures": [
+      "aggregate mined priors are LOO-adjusted per item for train candidate generation as stated; test-time compile = full data (as v3)",
+      "candidate cap 512 means oracle_saved (gold among saved candidates) can be slightly below v3's uncapped oracle; both are reported",
+      "the head is fitted on GSM8K train only and transferred zero-shot to HLE"
+    ]
+  },
+  "success_criteria_frozen": {
+    "primary_gsm8k_full_strict": "on the best preregistered head variant (S1/S2/S4): PASS if acc >= 0.035; PARTIAL if > 0.0235 (v1 strict); HONEST NEGATIVE if <= 0.0235; any upgrade claim additionally requires beating v3 strict 0.014405",
+    "selection_upgrade_check": "acc_when_gold_present(S1) >= 2x v3's realization ratio (v3: 0.0144/0.3995 = 3.60% -> target >= 7.20%) OR S1 top-5 >= 2x v3 top-5 (0.10842 -> >= 21.68%)",
+    "secondary_hle_t2full_strict": "> 0.02273 (v1)",
+    "reporting_rule": "whichever outcome occurs, real numbers reported; no post-hoc criterion changes"
+  },
+  "baselines": {
+    "v3_strict_gsm": 0.014404852160727824, "v3_loose_gsm": 0.02577710386656558,
+    "v3_oracle_gsm": 0.3995451099317665, "v3_top5_gsm": 0.10841546626231995,
+    "v3_strict_hle_t2full": 0.017482517482517484, "v3_oracle_hle_t2full": 0.17132867132867133,
+    "v3_strict_hle_t2v1": 0.0, "v3_oracle_hle_t2v1": 0.125,
+    "v1_strict_gsm": 0.02350265352539803, "v2_strict_gsm": 0.019711902956785442,
+    "v3_head_compile": {"lambda": 1000.0, "program_rows": 560, "classes": 24}
+  },
+  "run_integrity": {
+    "wall_budget": "foreground 460s slices, checkpoint/resume, no background processes",
+    "states": ["download/wspl_kgat_v4_state_train.json", "download/wspl_kgat_v4_state_test.json", "download/wspl_kgat_v4_state_hle.json"],
+    "head_artifact": "download/wspl_kgat_v4_head.json",
+    "results": "download/wspl_kgat_v4_results.json",
+    "build_times_reported": true
+  }
+}
