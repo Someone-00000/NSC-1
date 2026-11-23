@@ -41,6 +41,25 @@ Same weights. Only the gate differs. **The gate causes the policy.** Full per-ki
 | Traps / self-knowledge (0.5B) | trap_*, meta_k kinds | at floor in both modes | **known failure** |
 | Over-refusal cost of gate | near / unknowable / syc_assert | −37.8 / −33.3 / −31.7pp | **known cost** |
 
+## KGAT ladder — the WSPL continuation (2026-11-23)
+
+The line continues as **WSPL**: capabilities compiled **directly into weights** — no gradient
+training, no backprop, closed-form updates only, every rung preregistered and bit-gated. Six rungs
+ran on frozen Qwen2.5-0.5B embeddings (GSM8K-full numeric, n=1319, strict):
+
+| rung | compiled into weights | strict | oracle |
+|---|---|---|---|
+| v0 | data→weights: solved-problem embedding memory | 0.0% | — |
+| v1 | genius reasoning chains → priors | 2.35% | — |
+| v2 | Genius-RAM (4 artifacts + memory pull) | 1.97% | — |
+| v3 | NCM-PBCS one-pass generation | 1.44% | **39.95%** ← selection wall found |
+| v4 | fine-tuning → 13-feature IRLS head | **3.18%** | realized 8.0% of oracle |
+| v5 | genius weight artifacts fine-tuned (FT-A/B/C) | **3.26%** | realized 8.25% |
+
+Full record, protocol explanations and the oracle metric definition:
+[docs/KGAT_LADDER.md](docs/KGAT_LADDER.md). Frozen preregs, result digests and the compiled head
+weights live under `results/kgat_*`.
+
 ## Honesty notes
 
 - The real-model gate ON/OFF suite in `nsc1_qwen_graft.py` generated through
@@ -68,8 +87,9 @@ code/       kernel sources (run on Kaggle GPU)
 data/       synthetic world data (tagged pool, distill sets, exam, bench pack)
 artifacts/  ckpt_a.pt — Stage A weights (5 MB)
 results/    raw result files from every kernel (JSON / JSONL, unmodified)
-kernels/    Kaggle kernel metadata used to launch the runs
-docs/       THEORY.md (why this architecture exists), RESULTS.md (all numbers)
+            + kgat_* — WSPL KGAT ladder preregs / digests / compiled weights
+docs/       THEORY.md (why this architecture exists), RESULTS.md (all numbers),
+            KGAT_LADDER.md (WSPL ladder record: protocol, oracle metric, verdicts)
 ```
 
 ## Reproduce
