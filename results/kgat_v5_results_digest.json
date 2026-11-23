@@ -1,0 +1,498 @@
+{
+ "GSM8K_full": {
+  "S1_v5_ft": {
+   "acc": 0.032600454890068235,
+   "acc_when_gold_present": 0.08253358925143954,
+   "n": 1319,
+   "oracle_saved": 0.3949962092494314,
+   "realized_ratio": 0.08253358925143954,
+   "top10": 0.17968157695223655,
+   "top5": 0.11220621683093253
+  },
+  "S2_v5_ft_f1only": {
+   "acc": 0.029567854435178165,
+   "acc_when_gold_present": 0.07485604606525911,
+   "n": 1319,
+   "oracle_saved": 0.3949962092494314,
+   "realized_ratio": 0.07485604606525911,
+   "top10": 0.17361637604245642,
+   "top5": 0.1106899166034875
+  },
+  "S3_v5_fused": {
+   "acc": 0.0310841546626232,
+   "acc_when_gold_present": 0.07869481765834933,
+   "n": 1319,
+   "oracle_saved": 0.3949962092494314,
+   "realized_ratio": 0.07869481765834932,
+   "top10": 0.17968157695223655,
+   "top5": 0.11220621683093253
+  },
+  "v3_control": {
+   "acc_loose": 0.02577710386656558,
+   "acc_strict": 0.014404852160727824,
+   "n": 1319,
+   "oracle_full_inline": 0.3995451099317665,
+   "top5_inline": 0.10841546626231995
+  }
+ },
+ "HLE_T2_full_pool": {
+  "S1_v5_ft": {
+   "acc": 0.017482517482517484,
+   "acc_when_gold_present": 0.10526315789473684,
+   "n": 572,
+   "oracle_saved": 0.1660839160839161,
+   "realized_ratio": 0.10526315789473685,
+   "top10": 0.11713286713286714,
+   "top5": 0.07692307692307693
+  },
+  "S2_v5_ft_f1only": {
+   "acc": 0.02097902097902098,
+   "acc_when_gold_present": 0.12631578947368421,
+   "n": 572,
+   "oracle_saved": 0.1660839160839161,
+   "realized_ratio": 0.12631578947368421,
+   "top10": 0.12412587412587413,
+   "top5": 0.08216783216783216
+  },
+  "S3_v5_fused": {
+   "acc": 0.013986013986013986,
+   "acc_when_gold_present": 0.08421052631578947,
+   "n": 572,
+   "oracle_saved": 0.1660839160839161,
+   "realized_ratio": 0.08421052631578947,
+   "top10": 0.11713286713286714,
+   "top5": 0.07692307692307693
+  },
+  "v3_control_v4_reported": {
+   "acc_loose": 0.02097902097902098,
+   "acc_strict": 0.017482517482517484,
+   "n": 572,
+   "oracle_full_inline": 0.17132867132867133,
+   "top5_inline": 0.08741258741258741
+  }
+ },
+ "HLE_v1_T2": {
+  "S1_v5_ft": {
+   "acc": 0.017857142857142856,
+   "acc_when_gold_present": 0.14285714285714285,
+   "n": 56,
+   "oracle_saved": 0.125,
+   "realized_ratio": 0.14285714285714285,
+   "top10": 0.10714285714285714,
+   "top5": 0.08928571428571429
+  },
+  "S2_v5_ft_f1only": {
+   "acc": 0.0,
+   "acc_when_gold_present": 0.0,
+   "n": 56,
+   "oracle_saved": 0.125,
+   "realized_ratio": 0.0,
+   "top10": 0.10714285714285714,
+   "top5": 0.03571428571428571
+  },
+  "S3_v5_fused": {
+   "acc": 0.0,
+   "acc_when_gold_present": 0.0,
+   "n": 56,
+   "oracle_saved": 0.125,
+   "realized_ratio": 0.0,
+   "top10": 0.10714285714285714,
+   "top5": 0.08928571428571429
+  }
+ },
+ "ablations": {
+  "A": {
+   "S1": {
+    "acc": 0.037149355572403335,
+    "acc_when_gold_present": 0.09245283018867924,
+    "n": 1319,
+    "oracle_saved": 0.40181956027293403,
+    "realized_ratio": 0.09245283018867925,
+    "top10": 0.19257012888551933,
+    "top5": 0.12964366944655042
+   },
+   "S2_f1only": {
+    "acc": 0.02577710386656558,
+    "acc_when_gold_present": 0.06415094339622641,
+    "n": 1319,
+    "oracle_saved": 0.40181956027293403,
+    "realized_ratio": 0.06415094339622641,
+    "top10": 0.16679302501895377,
+    "top5": 0.10765731614859743
+   },
+   "arms": [
+    "A"
+   ],
+   "oracle_inline": 0.40181956027293403,
+   "times_s": {
+    "fit_head": 0.51,
+    "test_gen": 27.3,
+    "train_loo": 61.43
+   },
+   "train_oracle_inline": 0.393
+  },
+  "B": {
+   "S1": {
+    "acc": 0.0356330553449583,
+    "acc_when_gold_present": 0.08918406072106262,
+    "n": 1319,
+    "oracle_saved": 0.3995451099317665,
+    "realized_ratio": 0.08918406072106262,
+    "top10": 0.19257012888551933,
+    "top5": 0.12509476876421532
+   },
+   "S2_f1only": {
+    "acc": 0.02577710386656558,
+    "acc_when_gold_present": 0.06451612903225806,
+    "n": 1319,
+    "oracle_saved": 0.3995451099317665,
+    "realized_ratio": 0.06451612903225806,
+    "top10": 0.16755117513267628,
+    "top5": 0.10462471569370735
+   },
+   "arms": [
+    "B"
+   ],
+   "oracle_inline": 0.3995451099317665,
+   "times_s": {
+    "fit_head": 0.46,
+    "test_gen": 26.77,
+    "train_loo": 37.16
+   },
+   "train_oracle_inline": 0.394
+  },
+  "C": {
+   "S1": {
+    "acc": 0.032600454890068235,
+    "acc_when_gold_present": 0.08301158301158301,
+    "n": 1319,
+    "oracle_saved": 0.39272175890826383,
+    "realized_ratio": 0.08301158301158301,
+    "top10": 0.18043972706595907,
+    "top5": 0.1106899166034875
+   },
+   "S2_f1only": {
+    "acc": 0.02880970432145565,
+    "acc_when_gold_present": 0.07335907335907337,
+    "n": 1319,
+    "oracle_saved": 0.39272175890826383,
+    "realized_ratio": 0.07335907335907337,
+    "top10": 0.17361637604245642,
+    "top5": 0.10841546626231995
+   },
+   "arms": [
+    "C"
+   ],
+   "oracle_inline": 0.39272175890826383,
+   "times_s": {
+    "fit_head": 0.43,
+    "test_gen": 26.76,
+    "train_loo": 46.37
+   },
+   "train_oracle_inline": 0.371
+  }
+ },
+ "build_times_s": {
+  "compile": 0.15,
+  "eval_post": 0.64,
+  "fit_head": 0.37,
+  "ft_build": 0.29,
+  "gen_hle": 6.87,
+  "gen_test": 26.65,
+  "gen_train_loo_ft": 80.96,
+  "loo_pack_v3_total": 18.23,
+  "mine": 0.05,
+  "signal_pass": 37.29
+ },
+ "feature_importance": {
+  "dens": 0.005773,
+  "firstrank": 0.029338,
+  "frac_inband": 0.048417,
+  "in_question": 0.016523,
+  "len_norm": -0.011522,
+  "mag_soft": 0.02844,
+  "max_wsrc": 0.025089,
+  "nn_in_band": 0.022907,
+  "prov_ratio": 0.00715,
+  "score_rn": 0.015802,
+  "sigs": 0.022269,
+  "src_cls": 0.001815,
+  "text_pos": 0.01318
+ },
+ "ft_diagnostics": {
+  "W_abc": [
+   "[...896 items dropped in digest; full file kept locally...]"
+  ],
+  "bands": {
+   "anchored_to_delivered": 26,
+   "kept_v3": 10
+  },
+  "classifier": {
+   "W_val_top3_ft": 1.0,
+   "W_val_top3_v3": 0.3676,
+   "gram_update": "per-multiset weighted rank groups, exact LOO via delta of changed multisets"
+  },
+  "order_prior": {
+   "orders_boosted": 140
+  },
+  "rel_table": {
+   "****": {
+    "delivered": 1,
+    "rel": 0.1429,
+    "tried": 12
+   },
+   "**++": {
+    "delivered": 1,
+    "rel": 0.2,
+    "tried": 8
+   },
+   "**+/": {
+    "delivered": 6,
+    "rel": 0.1273,
+    "tried": 53
+   },
+   "**--": {
+    "delivered": 0,
+    "rel": 0.125,
+    "tried": 6
+   },
+   "*+": {
+    "delivered": 59,
+    "rel": 0.1379,
+    "tried": 433
+   },
+   "*++": {
+    "delivered": 12,
+    "rel": 0.1287,
+    "tried": 99
+   },
+   "*+-": {
+    "delivered": 45,
+    "rel": 0.1337,
+    "tried": 342
+   },
+   "*+--": {
+    "delivered": 8,
+    "rel": 0.1154,
+    "tried": 76
+   },
+   "*+-/": {
+    "delivered": 1,
+    "rel": 0.2,
+    "tried": 8
+   },
+   "*+/": {
+    "delivered": 11,
+    "rel": 0.129,
+    "tried": 91
+   },
+   "*--": {
+    "delivered": 12,
+    "rel": 0.1204,
+    "tried": 106
+   },
+   "*--/": {
+    "delivered": 2,
+    "rel": 0.1304,
+    "tried": 21
+   },
+   "*-/": {
+    "delivered": 34,
+    "rel": 0.1301,
+    "tried": 267
+   },
+   "*/": {
+    "delivered": 49,
+    "rel": 0.1453,
+    "tried": 342
+   },
+   "*//": {
+    "delivered": 8,
+    "rel": 0.1957,
+    "tried": 44
+   },
+   "+++-": {
+    "delivered": 0,
+    "rel": 0.25,
+    "tried": 2
+   },
+   "++-": {
+    "delivered": 2,
+    "rel": 0.15,
+    "tried": 18
+   },
+   "++-/": {
+    "delivered": 2,
+    "rel": 0.15,
+    "tried": 18
+   },
+   "++/": {
+    "delivered": 7,
+    "rel": 0.1509,
+    "tried": 51
+   },
+   "+-": {
+    "delivered": 34,
+    "rel": 0.1423,
+    "tried": 244
+   },
+   "+-/": {
+    "delivered": 8,
+    "rel": 0.1304,
+    "tried": 67
+   },
+   "+-//": {
+    "delivered": 5,
+    "rel": 0.1333,
+    "tried": 43
+   },
+   "--": {
+    "delivered": 3,
+    "rel": 0.1667,
+    "tried": 22
+   },
+   "--/": {
+    "delivered": 4,
+    "rel": 0.1667,
+    "tried": 28
+   }
+  },
+  "signal": {
+   "items": 1000,
+   "ms_delivered": 50,
+   "ms_tried": 60,
+   "orders_delivered": 140,
+   "total_deliveries": 547,
+   "total_tries": 6271
+  },
+  "spec": {
+   "classifier_lambda": 1000.0,
+   "kappa": 1.0,
+   "rel_formula": "(delivered+1)/(tried+2) per skeleton multiset, Laplace-smoothed"
+  },
+  "word_constants": {
+   "changed_vs_v3": 0,
+   "total": 60
+  }
+ },
+ "head": {
+  "artifact": "compiled fine-tuning weights (IRLS logistic head, no backprop) over FT genius artifacts",
+  "b": -1.047358,
+  "f1_only_head": {
+   "b": -1.296821,
+   "lambda": 0.01,
+   "val200_acc_all": 0.016129032258064516,
+   "val200_acc_when_gold_present": 0.043478260869565216,
+   "w": [
+    0.641087
+   ]
+  },
+  "features": [
+   "score_rn",
+   "dens",
+   "sigs",
+   "firstrank",
+   "max_wsrc",
+   "frac_inband",
+   "mag_soft",
+   "nn_in_band",
+   "in_question",
+   "text_pos",
+   "prov_ratio",
+   "src_cls",
+   "len_norm",
+   "bias"
+  ],
+  "fit_positives": 372,
+  "fit_rows": 44011,
+  "fit_time_s": 0.37,
+  "lambda": 1.0,
+  "val200_acc_all": 0.03225806451612903,
+  "val200_acc_when_gold_present": 0.08695652173913043,
+  "w": [
+   0.015802,
+   0.005773,
+   0.022269,
+   0.029338,
+   0.025089,
+   0.048417,
+   0.02844,
+   0.022907,
+   0.016523,
+   0.01318,
+   0.00715,
+   0.001815,
+   -0.011522
+  ]
+ },
+ "integrity": {
+  "gate1_signal": {
+   "gate": "GATE-1 signal pass vs v4 LOO records",
+   "items": 25,
+   "mismatch": 0,
+   "verdict": "PASS"
+  },
+  "gate2_v3_control": {
+   "ctrl_loose": 0.02577710386656558,
+   "ctrl_strict": 0.014404852160727824,
+   "gate": "GATE-2 v3-control from v4 state_test",
+   "n": 1319,
+   "v3_reported_loose": 0.02577710386656558,
+   "v3_reported_strict": 0.014404852160727824,
+   "verdict": "PASS"
+  }
+ },
+ "mechanism_note": "generation = v3 NCM-PBCS byte-identical; NEW = the compiled genius weight artifacts themselves are fine-tuned in weight space by closed-form updates (FT-A weighted skeleton classifier + delivered order prior; FT-B delivery-weighted operand role priors + op log-ratio bands; FT-C delivered-anchored answer bands + delivery-weighted word->constant table), driven by the leak-free LOO generative-correctness signal; v4 head protocol refitted on candidates regenerated under the fine-tuned artifacts",
+ "per_item_gsm": "[...1319 items dropped in digest; full file kept locally...]",
+ "run_tag": "kgat_v5_genius_ft",
+ "train_diagnostics": {
+  "S1_v5_ft": {
+   "acc": 0.027,
+   "acc_when_gold_present": 0.07258064516129033,
+   "n": 1000,
+   "oracle_saved": 0.372,
+   "realized_ratio": 0.07258064516129033,
+   "top10": 0.182,
+   "top5": 0.114
+  },
+  "S3_v5_fused": {
+   "acc": 0.031,
+   "acc_when_gold_present": 0.08333333333333333,
+   "n": 1000,
+   "oracle_saved": 0.372,
+   "realized_ratio": 0.08333333333333333,
+   "top10": 0.182,
+   "top5": 0.114
+  },
+  "oracle_full_inline": 0.372,
+  "v3_loo_inline_strict": 0.01
+ },
+ "user_theory": "We already turned the genius thinking way into weights (v1-v3 PBCS artifacts: skeleton classifier, role priors, op log-ratio bands, per-multiset answer bands, order prior, word->constant table). Since we already hold those weights, the next WSPL step is to TRAIN THEM: fine-tune the compiled genius weight artifacts directly, in weight space, staying with our goal of directly working with weights instead of using ML. Measure what fine-tuning the genius weights buys on the oracle-vs-selected gap this time.",
+ "verdicts": {
+  "S1_oracle": 0.3949962092494314,
+  "best_arm": "S1_v5_ft",
+  "best_strict": 0.032600454890068235,
+  "generation_check": "unchanged",
+  "hle_t2full_transfer_S2": "not improved",
+  "oracle_delta_vs_v4": -0.004549,
+  "primary_gsm8k_full_strict": "PARTIAL",
+  "realized_vs_oracle_pct": 8.25,
+  "selection_upgrade_check": "NOT CONFIRMED"
+ },
+ "verification_note": {
+  "added_utc": "2026-11-23T14:14:42.699769+00:00",
+  "diagnostics": [
+   "ft_diagnostics.classifier.W_val_top3_ft = 1.0 is INFLATED and report-only: the diagnostic evaluated the full-signal-weighted classifier on the same val rows whose own deliveries contributed the reliability weights. The pipeline itself is leak-free - every LOO pack rebuilds rel with the item's own delivery/tried events removed (rel_table_for) and the weighted Gram via exact delta of changed multisets.",
+   "HLE_v1_T2 S1_v5_ft = 1/56 (1.79%) is the FIRST nonzero strict result on HLE-v1 T2 in the program (v1/v2/v3/v4 all 0.0%). n=56, single item - reported as observation, not a claim.",
+   "A-only ablation (3.71% strict) is a SECONDARY preregistered ablation; per the frozen reporting rule (no post-hoc criterion changes) it does not take the primary verdict. It is the strongest measured configuration and motivates a preregistered follow-up with skeleton-reliability fine-tuning as the main arm.",
+   "word->constant fine-tune (FT-C) changed 0/60 table entries vs v3 - the delivery weighting did not move any top constant; FT-C's measured effect is therefore entirely from the delivered-anchored answer bands.",
+   "HLE T2-full S2 f1-only = 2.10% EQUALS v4's f1-only (frozen rule required strictly greater -> 'not improved'). Score-only selection is insensitive to the artifact fine-tuning on HLE."
+  ],
+  "gates": {
+   "GATE-1_signal_vs_v4_bitmatch": "PASS 25/25 (cands arrays + flags identical)",
+   "GATE-2_v3_control": "PASS exact (strict 0.014404852160727824, loose 0.02577710386656558)"
+  },
+  "single_slice": true
+ },
+ "version": "kgat_v5_genius_ft"
+}

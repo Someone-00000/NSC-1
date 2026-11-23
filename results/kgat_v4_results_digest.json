@@ -1,0 +1,243 @@
+{
+ "GSM8K_full": {
+  "v3_control": {
+   "acc_loose": 0.02577710386656558,
+   "acc_strict": 0.014404852160727824,
+   "n": 1319,
+   "oracle_full_inline": 0.3995451099317665,
+   "top5_inline": 0.10841546626231995
+  },
+  "v4_ft": {
+   "acc": 0.03184230477634572,
+   "acc_when_gold_present": 0.07969639468690702,
+   "n": 1319,
+   "oracle_saved": 0.3995451099317665,
+   "realized_ratio": 0.07969639468690702,
+   "top10": 0.18043972706595907,
+   "top5": 0.10917361637604246
+  },
+  "v4_ft_f1only": {
+   "acc": 0.02577710386656558,
+   "acc_when_gold_present": 0.06451612903225806,
+   "n": 1319,
+   "oracle_saved": 0.3995451099317665,
+   "realized_ratio": 0.06451612903225806,
+   "top10": 0.16679302501895377,
+   "top5": 0.10538286580742987
+  },
+  "v4_fused": {
+   "acc": 0.025018953752843062,
+   "acc_when_gold_present": 0.06261859582542695,
+   "n": 1319,
+   "oracle_saved": 0.3995451099317665,
+   "realized_ratio": 0.06261859582542693,
+   "top10": 0.18043972706595907,
+   "top5": 0.10917361637604246
+  }
+ },
+ "HLE_T2_full_pool": {
+  "v3_control": {
+   "acc_loose": 0.02097902097902098,
+   "acc_strict": 0.017482517482517484,
+   "n": 572,
+   "oracle_full_inline": 0.17132867132867133,
+   "top5_inline": 0.08741258741258741
+  },
+  "v4_ft": {
+   "acc": 0.01048951048951049,
+   "acc_when_gold_present": 0.061224489795918366,
+   "n": 572,
+   "oracle_saved": 0.17132867132867133,
+   "realized_ratio": 0.06122448979591837,
+   "top10": 0.11888111888111888,
+   "top5": 0.08041958041958042
+  },
+  "v4_ft_f1only": {
+   "acc": 0.02097902097902098,
+   "acc_when_gold_present": 0.12244897959183673,
+   "n": 572,
+   "oracle_saved": 0.17132867132867133,
+   "realized_ratio": 0.12244897959183675,
+   "top10": 0.12412587412587413,
+   "top5": 0.08741258741258741
+  },
+  "v4_fused": {
+   "acc": 0.015734265734265736,
+   "acc_when_gold_present": 0.09183673469387756,
+   "n": 572,
+   "oracle_saved": 0.17132867132867133,
+   "realized_ratio": 0.09183673469387756,
+   "top10": 0.11888111888111888,
+   "top5": 0.08041958041958042
+  }
+ },
+ "HLE_v1_T2": {
+  "v3_control": {
+   "acc_loose": 0.0,
+   "acc_strict": 0.0,
+   "n": 56,
+   "oracle_full_inline": 0.125,
+   "top5_inline": 0.05357142857142857
+  },
+  "v4_ft": {
+   "acc": 0.0,
+   "acc_when_gold_present": 0.0,
+   "n": 56,
+   "oracle_saved": 0.125,
+   "realized_ratio": 0.0,
+   "top10": 0.10714285714285714,
+   "top5": 0.07142857142857142
+  },
+  "v4_ft_f1only": {
+   "acc": 0.0,
+   "acc_when_gold_present": 0.0,
+   "n": 56,
+   "oracle_saved": 0.125,
+   "realized_ratio": 0.0,
+   "top10": 0.10714285714285714,
+   "top5": 0.05357142857142857
+  },
+  "v4_fused": {
+   "acc": 0.0,
+   "acc_when_gold_present": 0.0,
+   "n": 56,
+   "oracle_saved": 0.125,
+   "realized_ratio": 0.0,
+   "top10": 0.10714285714285714,
+   "top5": 0.07142857142857142
+  }
+ },
+ "build_times_s": {
+  "compile": 0.16,
+  "eval_post": 0.44,
+  "fit_head": 0.37,
+  "gen_hle": 7.0,
+  "gen_test": 27.01,
+  "gen_train_loo": 35.31,
+  "loo_pack_total": 16.36,
+  "mine": 0.05
+ },
+ "feature_importance": {
+  "dens": 0.006073,
+  "firstrank": 0.024578,
+  "frac_inband": 0.026822,
+  "in_question": 0.016277,
+  "len_norm": -0.011503,
+  "mag_soft": 0.028405,
+  "max_wsrc": 0.018516,
+  "nn_in_band": 0.022479,
+  "prov_ratio": 0.006604,
+  "score_rn": 0.014651,
+  "sigs": 0.021046,
+  "src_cls": 0.00367,
+  "text_pos": 0.012974
+ },
+ "head": {
+  "artifact": "compiled fine-tuning weights (IRLS logistic head, no backprop)",
+  "b": -1.014748,
+  "f1_only_head": {
+   "b": -1.246454,
+   "lambda": 0.01,
+   "val200_acc_all": 0.015873015873015872,
+   "val200_acc_when_gold_present": 0.04225352112676056,
+   "w": [
+    0.580059
+   ]
+  },
+  "features": [
+   "score_rn",
+   "dens",
+   "sigs",
+   "firstrank",
+   "max_wsrc",
+   "frac_inband",
+   "mag_soft",
+   "nn_in_band",
+   "in_question",
+   "text_pos",
+   "prov_ratio",
+   "src_cls",
+   "len_norm",
+   "bias"
+  ],
+  "fit_positives": 373,
+  "fit_rows": 44243,
+  "fit_time_s": 0.37,
+  "lambda": 1.0,
+  "val200_acc_all": 0.031746031746031744,
+  "val200_acc_when_gold_present": 0.08450704225352113,
+  "w": [
+   0.014651,
+   0.006073,
+   0.021046,
+   0.024578,
+   0.018516,
+   0.026822,
+   0.028405,
+   0.022479,
+   0.016277,
+   0.012974,
+   0.006604,
+   0.00367,
+   -0.011503
+  ]
+ },
+ "integrity": {
+  "v3_control_loose_gsm": 0.02577710386656558,
+  "v3_control_strict_gsm": 0.014404852160727824,
+  "v3_reported_loose": 0.02577710386656558,
+  "v3_reported_strict": 0.014404852160727824
+ },
+ "mechanism_note": "generation = v3 NCM-PBCS byte-identical (parallel skeleton concepts -> orderings -> genius+memory scored groundings -> one-pass candidates); NEW = fine-tuning compiled into weights: IRLS logistic head (13 features + bias, closed-form Newton, no backprop) fitted on leave-one-out generated train candidates; head weights stored in RAM alongside PBCS genius weights and applied at selection (v4-ft argmax logit; v4-fused 50/50 with v3 score)",
+ "per_item_gsm": "[...1319 items dropped in digest; full file kept locally...]",
+ "run_tag": "kgat_v4_ft_weights",
+ "train_diagnostics": {
+  "oracle_full_inline": 0.373,
+  "v3_control_inline_loose": 0.021,
+  "v3_control_inline_strict": 0.01,
+  "v4_ft": {
+   "acc": 0.03,
+   "acc_when_gold_present": 0.08042895442359249,
+   "n": 1000,
+   "oracle_saved": 0.373,
+   "realized_ratio": 0.08042895442359249,
+   "top10": 0.169,
+   "top5": 0.104
+  },
+  "v4_fused": {
+   "acc": 0.024,
+   "acc_when_gold_present": 0.064343163538874,
+   "n": 1000,
+   "oracle_saved": 0.373,
+   "realized_ratio": 0.064343163538874,
+   "top10": 0.169,
+   "top5": 0.104
+  }
+ },
+ "user_theory": "We have done two compilations: (1) data directly into weights (v0: solved-problem embedding library resident in RAM, pulled by cosine kNN) and (2) genius thinking patterns into weights (PBCS priors) that can directly use the data weights. v3 combined the second NCM concept: coarse-to-fine parallel generation with genius weights at the fine level - massive speed and a 40% oracle on GSM8K, but the selector could not recognize the right answer (1.44% strict). Following the WSPL steps, the next capability to compile is FINE-TUNING ITSELF: turn the fine-tuning adjustment into weights (closed-form fitted selector head, no backprop), keep those weights in RAM alongside the PBCS genius weights, keep the NCM method for generation, and measure whether selection improves this time.",
+ "verification_note": {
+  "added_utc": "2026-11-23T13:39:09.636608Z",
+  "determinism_recheck_live": {
+   "compile_val_top3": 0.3676,
+   "differing_items": 0,
+   "items_compared": 25,
+   "method": "scripts/debug_v4_determinism.py: fresh in-process regeneration of train items 0-24, diffed against wspl_kgat_v4_state_train.json",
+   "row_delta": 0,
+   "v3_reported_val_top3": 0.3676,
+   "verdict": "bit-reproducible; compile output identical to v3"
+  },
+  "integrity_gate_catches_during_run": [
+   "bug 1: wrong class-index mapping in candidate source (program-row vs raw-row) - caught by gate, fixed before any v4 number was reported",
+   "bug 2: hash-order nondeterminism in LOO constant injection - caught by gate, fixed before any v4 number was reported",
+   "debug artifacts: scripts/debug_v4_compile.py, debug_v4_stages.py, debug_v4_exec.py, debug_v4_isolate.py, debug_v4_determinism.py"
+  ],
+  "v3_control_check": {
+   "v3_control_loose_gsm": 0.02577710386656558,
+   "v3_control_strict_gsm": 0.014404852160727824,
+   "v3_reported_loose": 0.02577710386656558,
+   "v3_reported_strict": 0.014404852160727824,
+   "verdict": "exact match (100/100 items on the diagnostic slice, full-set strict+loose identical)"
+  }
+ },
+ "version": "kgat_v4_ft_weights"
+}
