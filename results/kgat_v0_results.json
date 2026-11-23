@@ -1,0 +1,50 @@
+{
+ "run_tag": "KGAT_ecff1af51ee623343dcae1c33b55c7b3",
+ "version": "kgat_v0",
+ "protocols": {
+  "ARC_C_full": {
+   "n": 1144,
+   "acc_kgat": 0.5244755244755245,
+   "consensus_rate": 0.9256993006993007,
+   "acc_when_consensus": 0.546742209631728,
+   "acc_single_ridge": 0.47027972027972026,
+   "acc_single_prototype": 0.5367132867132867,
+   "acc_single_knn": 0.5192307692307693,
+   "draft_agreement_rate_3of3": 0.5576923076923077
+  },
+  "MMLU_v1": {
+   "n": 1000,
+   "acc_kgat": 0.449,
+   "consensus_rate": 0.908,
+   "acc_when_consensus": 0.4669603524229075,
+   "acc_single_ridge": 0.438,
+   "acc_single_prototype": 0.452,
+   "acc_single_knn": 0.437,
+   "draft_agreement_rate_3of3": 0.513
+  },
+  "GSM8K_calc_suite": {
+   "n": 3825,
+   "acc_kgat_strict": 0.40339869281045754,
+   "coverage_majority": 0.5430065359477124,
+   "acc_single_ridge": 0.00026143790849673205,
+   "acc_single_knn_median": 0.45803921568627454,
+   "acc_single_knn_wmean": 0.34352941176470586
+  },
+  "GSM8K_full_numeric": {
+   "n": 1319,
+   "acc_kgat_strict": 0.0,
+   "coverage_majority": 0.0037907505686125853,
+   "acc_single_ridge": 0.0,
+   "acc_single_knn_median": 0.01061410159211524,
+   "acc_single_knn_wmean": 0.002274450341167551
+  },
+  "HLE_v1_T2": {
+   "n": 56,
+   "acc_kgat_strict": 0.0,
+   "coverage_majority": 0.0,
+   "acc_single_ridge": 0.0,
+   "acc_single_knn_median": 0.0,
+   "acc_single_knn_wmean": 0.0
+  }
+ }
+}

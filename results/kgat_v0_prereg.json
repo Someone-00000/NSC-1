@@ -1,0 +1,34 @@
+{
+ "run_tag": "KGAT_ecff1af51ee623343dcae1c33b55c7b3",
+ "version": "kgat_v0",
+ "frozen_before_any_eval": true,
+ "date": "2026-11-23",
+ "author_note": "User-proposed architecture: replace per-token autoregression with recall-then-multi-predict-then-verify, using compiled (gradient-free) weights. KGAT = user-supplied run tag.",
+ "mechanism": {
+  "R_recall": "cosine kNN over a compiled RAM-resident memory of frozen embeddings (knowledge weights); k=5, no fine-tuning",
+  "D_draft_multi_predict": "multiple parallel proposals in ONE pass, no autoregression: (a) MC tasks: 3 compiled readouts (ridge_global, class_prototype, knn_k5) each emit a full answer distribution; (b) numeric tasks: ridge numeric head + kNN-5 neighbor-value votes + similarity-weighted neighbor median",
+  "V_verify": "cross-draft verification, no test-label access: MC = majority consensus of 3 readouts, fallback = val-selected best readout; numeric = majority vote over {5 neighbor values + ridge pred}, abstain (counted wrong) if no majority",
+  "A_answer": "verified consensus only"
+ },
+ "protocols": {
+  "mc": {
+   "tasks": ["ARC-C_full (1144, filtered)", "MMLU v1 (1000)"],
+   "memory_train": ["arcc_train (600)", "mmlu_aux (1500)"],
+   "drafts": ["ridge_global", "class_prototype", "knn_k5"],
+   "verify_rule": "if >=2 of 3 drafts agree: answer=consensus; else: answer=class_prototype (val-selected single best)",
+   "metrics": ["acc_kgat", "consensus_rate", "acc_when_consensus", "acc_single_best_dws", "acc_single_best_pbcs"]
+  },
+  "numeric": {
+   "tasks": ["GSM8K_calc_suite (3825)", "GSM8K_full numeric (1319)", "HLE v1 T2 (56 integer-answer)"],
+   "memory_train": ["gsmcalc_train (8000)", "gsm_train (1000)"],
+   "drafts": ["ridge_numeric_pred", "knn5_neighbor_values", "knn5_simweighted_median"],
+   "verify_rule": "majority over multiset {5 neighbor values} + ridge pred; answer=majority value if count>=3 else abstain(wrong)",
+   "metrics": ["acc_kgat", "coverage", "acc_single_ridge", "acc_single_knnmed"]
+  }
+ },
+ "disclosures": [
+  "all heads closed-form fp64 ridge / prototype / kNN; zero gradients anywhere",
+  "verify uses ONLY internal agreement; no test labels touched",
+  "single-shot baseline numbers come from the same preregistered heads pipeline (wspl_realbench_heads_v1_out.json)"
+ ]
+}

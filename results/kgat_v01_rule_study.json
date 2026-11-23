@@ -1,0 +1,29 @@
+{
+ "ARC_C_v1_500": {
+  "v0_fallback_prototype": 0.528,
+  "v01_fallback_knn_recall": 0.528,
+  "acc_consensus_subset": 0.5472103004291845,
+  "consensus_rate": 0.932,
+  "single_ridge": 0.48,
+  "single_proto": 0.54,
+  "single_knn": 0.516
+ },
+ "ARC_C_full_1144": {
+  "v0_fallback_prototype": 0.5244755244755245,
+  "v01_fallback_knn_recall": 0.527972027972028,
+  "acc_consensus_subset": 0.546742209631728,
+  "consensus_rate": 0.9256993006993007,
+  "single_ridge": 0.47027972027972026,
+  "single_proto": 0.5367132867132867,
+  "single_knn": 0.5192307692307693
+ },
+ "MMLU_v1_1000": {
+  "v0_fallback_prototype": 0.449,
+  "v01_fallback_knn_recall": 0.448,
+  "acc_consensus_subset": 0.4669603524229075,
+  "consensus_rate": 0.908,
+  "single_ridge": 0.438,
+  "single_proto": 0.452,
+  "single_knn": 0.437
+ }
+}

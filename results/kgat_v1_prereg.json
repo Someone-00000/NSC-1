@@ -1,0 +1,105 @@
+{
+  "version": "kgat_v1",
+  "frozen_before_any_test_eval": true,
+  "date": "2026-11-23",
+  "author_note": "User theory: v0 recall+verify helped, but novelty requires a MAKING component - mine HOW geniuses reason from worked solutions, compile that logic into weights, and construct answers for novel problems. This file freezes the protocol before any test-side evaluation.",
+  "mechanism": {
+    "M_mine_genius_traces": "from the 1000 solved gsm_train v1 problems (frozen indices of wspl-realbench-001), extract calculator annotations <<expr=result>> as ground-truth reasoning chains",
+    "C_compile_logic": [
+      "skeleton head: fp64 closed-form ridge from frozen question embedding -> [count(+), count(-), count(*), count(/), n_steps]; NO gradients",
+      "word->constant logic table: mined (word, injected-constant) pairs from solution windows; compiled lookup, no gradients"
+    ],
+    "D_draft_making": "for a novel problem: decode up to 3 operator skeletons from the compiled head, enumerate operand-grounded programs (text numbers + injected constants + intermediate results), execute ALL programs in one parallel pass (no autoregression anywhere)",
+    "V_verify": "internal only, no test labels: positive-integer rule, memory magnitude band from cosine 5-NN recalled answers (gsm_train memory), cross-draft consensus (count >= 2)",
+    "A_answer": "strict = consensus value, abstain counted wrong; loose = best-ranked valid draft (diagnostic)"
+  },
+  "data": {
+    "train_memory": "gsm_train v1 (1000 items, indices frozen in scripts/realbench/prereg.json, stage gsm_train)",
+    "test_tasks": [
+      "GSM8K full numeric (1319)",
+      "HLE v1 T2 (56 integer-answer items, rule: gold parses as int)"
+    ],
+    "excluded": [
+      "GSM8K calc suite: excluded from Making (raw expressions contain the full program in the input text = oracle shortcut, not model reasoning); v0 recall numbers stand",
+      "MC tasks (ARC-C, MMLU): numeric grammar not applicable; v0 numbers stand"
+    ]
+  },
+  "train_side_facts_measured_before_freeze": {
+    "gold_positive_integers": "998/1000",
+    "solutions_with_annotations": "993/1000",
+    "fully_single_op_chains_le4_steps": "561/1000 (grammar coverage 56.1%)",
+    "n_steps_hist_of_kept": {"1": 39, "2": 230, "3": 196, "4": 96},
+    "literal_occurrences_in_question_text": 2773,
+    "literal_occurrences_injected_not_in_text": 1850
+  },
+  "amendment_v1_1_before_any_test_eval": {
+    "reason": "train-side diagnostic (probe_train_enum.py, no test data): with GOLD skeletons, operand-coverage was 0.308 (n=561); word->constant table at support>=5/purity>=0.5/top40 compiled only 5 words; canonical ordering was NOT the bottleneck (gold median rank 6).",
+    "changes": {
+      "word_constant_table": "support >= 3, purity >= 0.4, top 60 by support (compiles 32 words on train)",
+      "enumeration_cap": "256 -> 1024 programs per problem"
+    },
+    "measured_grammar_ceiling_disclosed": "1105/2940 non-text solution literals are story-specific facts not recoverable by any generalizable word->constant table (train-side count); this is an honest ceiling of the compiled grammar",
+    "status": "amendment applied before ANY test-side evaluation"
+  },
+  "mining_rules": {
+    "annotation_regex": "<<(.+?)=(-?[\\d\\.,]+)>>",
+    "grammar": "steps with exactly one operator, 1..4 steps; 561 head-train rows",
+    "word_constant_table": "AMENDED v1.1: window = 60 chars of solution text before each annotation; tokens = lowercase [a-z]+; constants = step literals NOT present in question text; keep pairs with support >= 3 and purity >= 0.4 (constant = majority for that word); top 60 by support; at test inject <= 4 constants per problem"
+  },
+  "skeleton_head_recipe": {
+    "estimator": "ridge closed form (X^T X + lambda I)^{-1} X^T y, fp64, NO gradients",
+    "standardization": "mean/std from the 561 head-train rows, eps 1e-8",
+    "lambda_grid": [0.001, 0.01, 0.1, 1.0, 10.0, 100.0],
+    "lambda_selection": "rng np.random.default_rng(20261123) shuffle of 561 rows, last 20% as val, val RMSE",
+    "targets": "[cnt_+, cnt_-, cnt_*, cnt_/, n_steps]"
+  },
+  "decoding_rules": {
+    "n_steps": "clip(round(pred_n_steps), 1, 4)",
+    "multisets": "up to 3 distinct operator multisets: (a) rounded counts adjusted to n_steps; (b) one unit moved from lowest-predicted op to highest-predicted op; (c) top-n_steps ops one each; ranked a, b, c",
+    "op_orders": "all distinct permutations ranked by mined train-order prior (freq desc, then lexicographic)"
+  },
+  "operand_rules": {
+    "text_numbers": "regex \\d[\\d,]*(?:\\.\\d+)? on question, strip commas, first 8 in text order",
+    "injected_constants": "question lowercase tokens matched in word_constant_table, top-4 by support, deduped, appended after text numbers",
+    "intermediates": "previous step results, single use",
+    "consumption": "each operand instance used at most once per program"
+  },
+  "enumeration_rules": {
+    "cap": "max 256 programs per problem, deterministic canonical order: skeleton rank -> op permutation rank -> operand pairs by pool index; from step 2 onward, pairs involving the previous result come first",
+    "discard": "division by zero, |x| > 1e15, non-finite intermediates"
+  },
+  "verify_rules": {
+    "integer_rule": "|x - round(x)| < 1e-6 and x > 0 (train golds: 998/1000 positive integers)",
+    "memory_band": "cosine 5-NN recalled gsm_train answers; valid band in(nn)/10, max(nn)*10]; out-of-band drafts demoted below in-band ones",
+    "consensus": "value counts over valid drafts rounded to 1e-6; consensus = count >= 2; tie -> higher count, then first occurrence",
+    "strict": "consensus value else WRONG (abstain)",
+    "loose": "no consensus -> best-ranked valid draft (diagnostic only)"
+  },
+  "amendment_v1_2_before_any_test_eval": {
+    "reason": "val-side check of the count-regression skeleton head: gold-multiset recall only 0.027 (n=112). Replaced (supersede, not tuned on test) by MC-style compiled classifier + skeleton recall, both closed-form/gradient-free.",
+    "skeleton_drafts_recipe": "union of (a) ridge one-hot classifier over top-24 most frequent ordered skeleton classes (closed-form fp64, lambda grid selected on train-val by top-3 exact-class accuracy; selected lambda=100) -> top-3 predicted classes; (b) kNN-5 over the 561 skeleton-bearing train rows (cosine, standardized) -> each neighbor's skeleton; dedupe by multiset; class-rank order; max 8 multisets",
+    "draft_cap_amended": "per op-order cap 128, global cap 1024 (bounded runtime, spreads coverage across op orders)",
+    "two_recall_memories_disclosed": "skeleton recall uses the 561 skeleton-bearing rows; answer-band recall uses the 1000-item answer memory (v0-style)",
+    "val_diagnostics_train_side_only": {
+      "classifier_top3_exact_class": 0.371,
+      "classifier_top3_multiset": 0.286,
+      "knn5_skeleton_multiset": 0.295,
+      "union_multiset_recall": 0.402,
+      "n_val": 112
+    },
+    "status": "amendment applied before ANY test-side evaluation"
+  },
+  "metrics_and_comparison": {
+    "baselines_same_tasks_from": "download/wspl_kgat_v0_results.json",
+    "gsm8k_full_baselines": {"v0_kgat_strict": 0.0, "recall_knn_median": 0.01061410159211524, "single_ridge": 0.0},
+    "hle_t2_baselines": {"v0_kgat_strict": 0.0, "recall_knn_median": 0.0, "single_ridge": 0.0},
+    "success_criterion_frozen": "acc_strict on GSM8K full > 2x recall baseline (i.e. > 2.2%) means Making adds capability beyond memory; otherwise report as honest negative"
+  },
+  "run_integrity": {
+    "no_test_labels_in_mining_compile_or_verify": true,
+    "single_final_eval_per_task": true,
+    "operand_grounding_disclosure": "operands come from input question tokens (available to any model through its encoder) and mined train constants; the REASONING (operators, order) is predicted by compiled weights from the embedding",
+    "build_times_reported": ["mine_s", "compile_s", "eval_s"],
+    "mc_and_calc": "unchanged from v0; only numeric novelty tasks evaluated here"
+  }
+}
