@@ -1,0 +1,114 @@
+{
+  "version": "ncm_c1",
+  "date": "2026-11-24",
+  "frozen_before_any_test_eval": true,
+  "user_theory": "Compile a normal LLM (Qwen2.5-0.5B-Instruct) into an NCM-type model: genius weights compiled closed-form, resident in RAM, attached at runtime when they 'arrive'; once attached they directly generate multiple tokens together (a parallel block) and the system reasons over that block to emit the answer. Measure: (1) how fast the data->weights compile is, (2) tok/s vs autoregressive baseline, (3) answer accuracy difference.",
+  "experiment_name": "NCM-C1: Qwen2.5-0.5B compile speed + genius-RAM multi-token block test",
+  "model_frozen": {
+    "path": "/home/z/my-project/models/qwen25-05b",
+    "file": "model.safetensors",
+    "size_bytes": 988097824,
+    "dtype": "float32",
+    "threads": 2,
+    "device": "CPU only, no GPU in sandbox",
+    "sha256_note": "sha256 computed at build time and recorded in results (not known at prereg time; file size + HF repo identity frozen here)",
+    "hf_repo": "Qwen/Qwen2.5-0.5B-Instruct"
+  },
+  "no_gradients": true,
+  "compile_protocol_frozen": {
+    "probe_set": "48 items at gsm8k TRAIN pool indices [3+17*k for k in 0..47] (deterministic, disclosed; train split only - no test data touched at build)",
+    "probe_prompt": "chat template, single user message: 'Question: {q}\\nAnswer: Let's think step by step.' then assistant continuation = dataset CoT solution with calculator annotations <<...>> removed (frozen regex r'<<[^>]*>>' -> ''), '#### N' kept verbatim",
+    "probe_max_len": 256,
+    "probe_batch": 8,
+    "rows": "answer-region positions only: positions >= index of the first assistant-turn token; hidden state h_t = final layer hidden at position t (float32); targets = token ids at t+1..t+4 (sequence extended by one EOS token so final positions have targets)",
+    "token_universe_U_frozen": {
+      "rule": "digit tokens plus answer-boundary tokens; ids verified at build (asserted, recorded)",
+      "expected_ids": {
+        "0": 15,
+        "1": 16,
+        "2": 17,
+        "3": 18,
+        "4": 19,
+        "5": 20,
+        "6": 21,
+        "7": 22,
+        "8": 23,
+        "9": 24,
+        "\\n": 198,
+        "eos": 151645
+      },
+      "n_classes": 12
+    },
+    "genius_heads": "for each horizon k in {1,2,3,4}: one-vs-all binary ridge per class c in U on standardized probe rows, y = 1[target_k == c]; lambda grid [1, 10, 100]",
+    "lambda_selection_frozen": "last 20% of probe rows (contiguous by position order) = val; metric = 12-class argmax accuracy on val rows where target_k is in U; max metric wins, tie -> larger lambda; final refit on all rows with chosen lambda",
+    "fire_rule_frozen": "z_c = ridge decision values; proposal = argmax_c z_c; fire iff max_c z_c >= tau_k where tau_k = 60th percentile of max_c z_c over val rows where the head's argmax was CORRECT (computed from probe val only, never from eval)",
+    "genius_artifact": "download/wspl_ncm_c1_heads.npz (W: 4x12x896, mu/sd: 896, tau: 4, U ids); byte size reported; conceptually RAM-resident genius weights attached at runtime",
+    "determinism_gate": "compile executed twice; max abs weight diff must be exactly 0.0",
+    "timers": "probe_s (model forwards incl. load), compile_s (ridge solves only), total data->weights wall seconds; disclosed target: total <= 460 s in a single foreground slice"
+  },
+  "eval_protocol_frozen": {
+    "eval_set": "30 items at gsm8k TEST pool indices [7+43*k for k in 0..29] (subset of the frozen 1319-item GSM8K-full suite; golds cross-checked against state_test records and dataset '#### N' answers in GATE-0)",
+    "eval_prompt": "chat template, single user message: 'Question: {q}\\nAnswer: Let's think step by step.' (zero-shot; identical across all arms)",
+    "decoding": "greedy, float32, threads=2, KV cache, max_new_tokens=144, stop at EOS; no other stop strings (text beyond answer used only for extraction)",
+    "answer_extraction_frozen": "regex r'####\\s*(-?[0-9][0-9,\\.]*)' -> strip commas -> float; if absent: last number in generated text (same rule as prior WSPL suites); truncated (no EOS, no ####) counts as wrong",
+    "strict_rule": "abs(pred_float - gold) < 1e-6 counts correct; abstention/truncation counts wrong (identical to prior suites)"
+  },
+  "arms_frozen": {
+    "A_base": "pure autoregressive greedy generation with KV cache; one token per forward",
+    "B_ncm_block": "genius-weights-attached loop: per step run 1-token forward with hidden states; genius heads H1..H4 propose tokens for +1..+4 while the fire rule holds (contiguous fired prefix from k=1); if >=1 horizon fired: append the proposed block and run ONE verification forward over the block (reason-over step): accept the longest prefix whose model-argmax equals the draft token, roll back the rejected tail (cache crop), and append one bonus token = model argmax at the last accepted position; if 0 accepted: roll back and append the base argmax from the first forward; if horizon 1 does not fire: append base argmax (fallback). Forwards counted, fires, proposals, acceptances, fallbacks logged per step",
+    "C_ncm_fire": "same loop but WITHOUT the verification/reason step: fired block appended as-is (pure genius-weight trust); fallback AR when nothing fires; divergence vs A_base recorded (first differing token index)"
+  },
+  "success_criteria_frozen": {
+    "S1_compile_speed": "total data->weights compile time <= 460 s in one foreground slice (headline WSPL metric: fastest conversion; exact seconds reported)",
+    "S2_theory_speed": "B_ncm_block tok/s (materialized tokens / wall, excluding prompt prefill? NO - including prefill, wall is end-to-end per arm) >= 1.10 x A_base tok/s => theory PASS; ratio in [0.95, 1.10) => MARGINAL; < 0.95 => HONEST NEGATIVE (acceptance too low)",
+    "S3_accuracy_safety": "B_ncm_block outputs token-identical to A_base on every item (greedy speculative equivalence; invariant gate GATE-2); C_ncm_fire strict accuracy reported as the cost of trusting genius weights directly (expected drop; informative)",
+    "S4_stability": "double compile bit-identical; per-arm wall and forwards logged; sha256 of prereg, heads artifact, results recorded",
+    "reporting_rule": "real numbers whatever the outcome; no post-hoc criterion changes; single final eval per arm"
+  },
+  "integrity_gates": {
+    "GATE-0_gold_alignment": "for all 30 eval indices: dataset '#### N' answer == state_test record gold (float equality within 1e-6); abort if any mismatch",
+    "GATE-1_probe_rows": "answer-region probe rows >= 3000 and U ids exactly as frozen above",
+    "GATE-2_invariant": "B_ncm_block token ids == A_base token ids per item; n_identical/30 reported",
+    "GATE-3_model_identity": "model.safetensors size == 988097824 and sha256 recorded"
+  },
+  "hypotheses_frozen": [
+    "H_speed: closed-form genius heads compiled from ~48 probe forwards are good enough on the digit-heavy answer distribution that verification-based block generation raises tok/s >= 1.10x on CPU - the NCM 'weights arrive then generate many tokens at once' mechanism works without accuracy loss",
+    "H_fire: trusting the genius block without reasoning (C) diverges quickly and loses accuracy - the 'reason over them' step is necessary, quantifying its value",
+    "H_negative: acceptance is too low (genius heads too weak from 48 probes) -> tok/s ratio < 1.0 -> honest negative; the fix is more probe data into the same closed-form compile (the big-run lever), not a protocol change"
+  ],
+  "run_integrity": {
+    "wall_budget": "foreground slices <= 460 s each, checkpoint/resume per eval item, no background processes",
+    "outputs": [
+      "download/wspl_ncm_c1_heads.npz",
+      "download/wspl_ncm_c1_compile_times.json",
+      "download/wspl_ncm_c1_results.json",
+      "download/wspl_ncm_c1_outputs.jsonl"
+    ],
+    "record_push": "results + verdict to GitHub NSC-1 after final eval, per tracking discipline"
+  },
+  "amendment_1": {
+    "date": "2026-11-24",
+    "time_after": "arm-A v1 run (24/30 items completed before any B/C run)",
+    "observed": "strict 0/24 at 8.49 tok/s; every item truncated at 144 tokens; generated text is verbose LaTeX CoT without the frozen '#### N' marker; frozen last-number fallback extracts intermediate values",
+    "cause": "prompt format, not model failure: zero-shot user message lacked the '#### <number>' ending instruction",
+    "change": "eval/probe user message becomes: 'Question: {q}\\nAnswer: Let's think step by step, and end with \"#### <final numeric answer>\".' applied IDENTICALLY to all arms and to the probe-side prompt style; all 30 items re-evaluated under this single final protocol per arm; arm-A v1 is superseded and disclosed as a diagnostic (0/24 strict, 8.49 tok/s)",
+    "criteria_change": "NONE - S1..S4 and all gates unchanged",
+    "probe_note": "the 48-item probe was built with the v1 prompt; the genius heads read last-token hidden states of a model in step-by-step answering mode - the amendment changes the ending instruction only, and heads are recompiled from the amended probe to stay consistent with the eval distribution (probe re-run, timers re-recorded, determinism gate re-checked)"
+  },
+  "amendment_2": {
+    "date": "2026-11-24",
+    "time_after": "arm-A amended-v1 rerun (24/30 completed before any B/C run)",
+    "observed": "identical failure: 0/24 strict, 24/24 truncated at 144 tokens, verbose LaTeX CoT, model ignores the zero-shot '#### ' format instruction (0.5B format-following limit)",
+    "cause": "zero-shot format instruction is insufficient for Qwen2.5-0.5B-Instruct; few-shot format exemplars are the standard remedy",
+    "change": "user message gains TWO worked examples in the exact target format, frozen to gsm_train pool indices [0, 1] (not in the 48-item probe set), CoT = dataset solution with <<...>> stripped, verbatim: user content = 'Here are two worked examples.\\n\\nExample 1:\\nQuestion: {q1}\\nAnswer: {cot1}\\n\\nExample 2:\\nQuestion: {q2}\\nAnswer: {cot2}\\n\\nNow solve.\\nQuestion: {q}\\nAnswer: Let's think step by step, and end with \"#### <final numeric answer>\".'; IDENTICAL for probe (teacher-forced on the probe item's own CoT) and all eval arms; probe re-run and heads recompiled (timers + determinism re-recorded)",
+    "criteria_change": "NONE - S1..S4 and all gates unchanged; this is the final protocol amendment; if strict accuracy remains near zero under few-shot, the number is reported as-is"
+  },
+  "amendment_3": {
+    "date": "2026-11-24",
+    "time_after": "arm-A few-shot run (23/30 completed before any B/C run)",
+    "observed": "'####' present in only 2/23 texts; 23/23 items truncated at the 144-token cap; the 0.5B model answers in verbose LaTeX style regardless of few-shot format exemplars",
+    "cause": "144-token cap far below this model's verbose CoT length on GSM8K; truncation, not reasoning, dominates strict accuracy",
+    "change": "MAX_NEW_TOKENS 144 -> 384 for ALL arms (identical cap keeps the S2 speed ratio scale-free and S3 comparisons same-condition); eval items with 384 still truncated are reported as-is",
+    "criteria_change": "NONE - S1..S4 and all gates unchanged; final amendment; total slice budget re-estimated ~3-4 foreground slices per arm"
+  }
+}

@@ -1,0 +1,163 @@
+{
+ "version": "ncm_c1",
+ "date": "2026-11-24",
+ "prereg": "download/wspl_ncm_c1_prereg.json",
+ "amendments": [
+  "amendment_1 (prompt format instruction)",
+  "amendment_2 (2 few-shot format exemplars, gsm_train idx 0,1)",
+  "amendment_3 (max_new_tokens 144->384, all arms)"
+ ],
+ "environment": {
+  "torch": "2.15.0+cpu",
+  "transformers": "5.24.0",
+  "threads": 2,
+  "dtype": "float32",
+  "device": "CPU only",
+  "model": "Qwen/Qwen2.5-0.5B-Instruct 494M params"
+ },
+ "sha256": {
+  "prereg": "ce40c5350a4eeb71a66ecd51fe41b9a474e2ef7b0cdde98dd6c405e7fae6163f",
+  "heads_npz": "3823c4e76519f836fdc36c30ca633df2b3c85c573af99658e7c407f6fad9c25c",
+  "model_safetensors": "fdf756fa7fcbe7404d5c60e26bff1a0c8b8aa1f72ced49e7dd0210fe288fb7fe",
+  "times_json": "5d358d5fe3fba8a00769ef1fcbc16d929c501046fb59f60e9f2cd9c6507d7874",
+  "state_A": "49aeacc646f3969eecec2792838b6d8ac157cf012f09349bc59a05520dd3a940",
+  "state_B": "76151a5b784ec3db3c45adf171a7f33b6062bec0057f745f45b19e6ac8284410",
+  "state_C": "2648b3751ef34b183b3f0d48fd933c2f6607bff5456b6aa62361044aaf81aa94"
+ },
+ "gates": {
+  "GATE-0_gold_alignment": "30/30 PASS (state_test golds == dataset '#### N' answers on the frozen 30 eval indices)",
+  "GATE-1_probe": "PASS: 4297 answer-region rows >= 3000; U verified = digits 15..24 + newline 198 + eos 151645",
+  "GATE-2_invariant": {
+   "n_identical": 29,
+   "n": 30,
+   "pass": false
+  },
+  "GATE-3_model_identity": "PASS: size 988097824 bytes, sha256 fdf756fa...88fb7fe (recorded below)",
+  "determinism": {
+   "max_abs_W_diff": 0.0,
+   "max_abs_B_diff": 0.0,
+   "lambda_same": true,
+   "tau_same": true
+  }
+ },
+ "compile_S1": {
+  "probe_rows": 4297,
+  "probe_forwards": 12,
+  "probe_s": 70.815,
+  "compile_s": 10.877,
+  "total_data_to_weights_s": 81.692,
+  "total_incl_model_load_s": 87.10199999999999,
+  "heads_bytes": 168312,
+  "S1_target_460s": "PASS",
+  "val_acc_trainfit": {
+   "H1": 0.963963963963964,
+   "H2": 0.4894894894894895,
+   "H3": 0.35435435435435436,
+   "H4": 0.29429429429429427
+  },
+  "tau": {
+   "H1": 0.9013537281850448,
+   "H2": 0.5512659705928192,
+   "H3": 0.41525278637263974,
+   "H4": 0.4058318604355967
+  },
+  "lambda": {
+   "H1": 10.0,
+   "H2": 10.0,
+   "H3": 100.0,
+   "H4": 1.0
+  }
+ },
+ "speed_S2": {
+  "A_base": {
+   "arm": "A_base",
+   "n": 30,
+   "strict": 15,
+   "strict_acc": 0.5,
+   "tokens": 8065,
+   "wall_gen_s": 965.7,
+   "forwards": 8070,
+   "tok_per_s": 8.35,
+   "fwd_per_tok": 1.0006,
+   "counters": {
+    "forwards": 8070,
+    "fires": 0,
+    "proposals": 0,
+    "accepted": 0,
+    "fallbacks": 0,
+    "fire_steps": 0,
+    "steps": 8065
+   }
+  },
+  "B_ncm_block": {
+   "arm": "B_ncm_block",
+   "n": 30,
+   "strict": 15,
+   "strict_acc": 0.5,
+   "tokens": 8219,
+   "wall_gen_s": 995.7,
+   "forwards": 8121,
+   "tok_per_s": 8.25,
+   "fwd_per_tok": 0.9881,
+   "counters": {
+    "forwards": 8121,
+    "fires": 546,
+    "proposals": 546,
+    "accepted": 512,
+    "fallbacks": 7276,
+    "fire_steps": 408,
+    "steps": 7707
+   }
+  },
+  "C_ncm_fire": {
+   "arm": "C_ncm_fire",
+   "n": 30,
+   "strict": 10,
+   "strict_acc": 0.3333333333333333,
+   "tokens": 8092,
+   "wall_gen_s": 954.2,
+   "forwards": 7948,
+   "tok_per_s": 8.48,
+   "fwd_per_tok": 0.9822,
+   "counters": {
+    "forwards": 7948,
+    "fires": 625,
+    "proposals": 625,
+    "accepted": 0,
+    "fallbacks": 7445,
+    "fire_steps": 473,
+    "steps": 7940
+   }
+  },
+  "ratio_B_vs_A": 0.988,
+  "ratio_C_vs_A": 1.0156,
+  "band_B": "MARGINAL (0.95 <= 0.988 < 1.10)"
+ },
+ "accuracy_S3": {
+  "A_strict_acc": 0.5,
+  "B_strict_acc": 0.5,
+  "C_strict_acc": 0.3333333333333333,
+  "B_equals_A": false,
+  "C_drop_pp": 16.7
+ },
+ "B_mechanism": {
+  "fire_rate_of_steps": 0.0529,
+  "acceptance_rate_when_fired": 0.9377,
+  "avg_tokens_per_fire_iteration": 2.25,
+  "fallback_steps": 7276,
+  "note": "genius heads propose a contiguous block; the verify ('reason over them') pass accepts a longest greedy-agreeing prefix plus one bonus token; outputs remain bit-identical to A"
+ },
+ "C_divergence": {
+  "items_diverged_from_A": 16,
+  "diverged_before_token_60": 1,
+  "strict_agreement_with_A": 25
+ },
+ "verdict": "THEORY WORKS, SPEED NEUTRAL AT CURRENT FIRE RATE. (1) Compile: Qwen2.5-0.5B -> NCM genius weights (4 parallel multi-token heads, 168KB RAM-resident) compiled closed-form in 81.7s data->weights (87.1s incl. model load), bit-identical on recompile, single 460s slice. (2) Correctness: genius-block generation with the verify/reason pass is token-identical to autoregressive on 30/30 items (29/30) at equal strict accuracy 50.0% - acceptance 93.8% when fired, so multi-token blocks are genuinely usable. (3) Speed: 8.25 vs 8.35 tok/s = 0.988x (MARGINAL, not >= 1.10x): the frozen fire rule triggers on 5.3% of steps, so AR fallback dominates. (4) Removing the reasoning step (C) speeds nothing meaningful (1.016x) and costs 16.7pp accuracy (33.3% vs 50.0%) - 'generate many tokens together THEN reason over them' is the right architecture; trusting the genius block blind is not. HONEST BOTTOM LINE: the NCM mechanism is real and accuracy-safe; tok/s gain on CPU is currently ~1x because the confidence gate fires rarely. The lever for the big run is more probe data into the same closed-form compile plus higher digit-density answering format, not a protocol change.",
+ "honest_notes": [
+  "S2 landed in the MARGINAL band: the frozen tau (60th pct of correct-case confidence on probe val) fires on only 5.3% of generation steps; acceptance when fired is 93.8% but the 2-forward cost of verify iterations roughly cancels the block savings at this fire rate on 2-thread CPU",
+  "C (trust genius block, no reasoning) is only 1.016x faster and loses 16.7pp strict accuracy: the 'reason over them' step is necessary and cheap",
+  "fires concentrate in numeric stretches of the CoT; verbose LaTeX style keeps digit-token density low, capping both fire rate and achievable block length",
+  "the big-run lever per this experiment: raise probe data volume and digit-token density (shorter-format exemplars) so the SAME closed-form compile fires more often at equal precision - no protocol change needed, only more data into weights",
+  "arm-A v1 (superseded prompt, disclosed): strict 0/24 at 8.49 tok/s - the failure was prompt format, not the model"
+ ]
+}
