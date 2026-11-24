@@ -150,7 +150,249 @@
  "C_divergence": {
   "items_diverged_from_A": 16,
   "diverged_before_token_60": 1,
-  "strict_agreement_with_A": 25
+  "strict_agreement_with_A": 25,
+  "detail": [
+   {
+    "idx": "7",
+    "first_div": 113,
+    "len_C": 244,
+    "len_A": 249,
+    "strict_A": false,
+    "strict_C": false
+   },
+   {
+    "idx": "50",
+    "first_div": 80,
+    "len_C": 293,
+    "len_A": 299,
+    "strict_A": true,
+    "strict_C": false
+   },
+   {
+    "idx": "93",
+    "first_div": -1,
+    "len_C": 384,
+    "len_A": 384,
+    "strict_A": false,
+    "strict_C": false
+   },
+   {
+    "idx": "136",
+    "first_div": -1,
+    "len_C": 122,
+    "len_A": 122,
+    "strict_A": true,
+    "strict_C": true
+   },
+   {
+    "idx": "179",
+    "first_div": 78,
+    "len_C": 193,
+    "len_A": 191,
+    "strict_A": true,
+    "strict_C": false
+   },
+   {
+    "idx": "222",
+    "first_div": 139,
+    "len_C": 141,
+    "len_A": 157,
+    "strict_A": true,
+    "strict_C": true
+   },
+   {
+    "idx": "265",
+    "first_div": 337,
+    "len_C": 384,
+    "len_A": 384,
+    "strict_A": true,
+    "strict_C": true
+   },
+   {
+    "idx": "308",
+    "first_div": 294,
+    "len_C": 331,
+    "len_A": 328,
+    "strict_A": false,
+    "strict_C": false
+   },
+   {
+    "idx": "351",
+    "first_div": -1,
+    "len_C": 237,
+    "len_A": 237,
+    "strict_A": false,
+    "strict_C": false
+   },
+   {
+    "idx": "394",
+    "first_div": -1,
+    "len_C": 126,
+    "len_A": 126,
+    "strict_A": false,
+    "strict_C": false
+   },
+   {
+    "idx": "437",
+    "first_div": 79,
+    "len_C": 330,
+    "len_A": 329,
+    "strict_A": false,
+    "strict_C": false
+   },
+   {
+    "idx": "480",
+    "first_div": 216,
+    "len_C": 384,
+    "len_A": 384,
+    "strict_A": false,
+    "strict_C": false
+   },
+   {
+    "idx": "523",
+    "first_div": -1,
+    "len_C": 230,
+    "len_A": 230,
+    "strict_A": false,
+    "strict_C": false
+   },
+   {
+    "idx": "566",
+    "first_div": 47,
+    "len_C": 250,
+    "len_A": 224,
+    "strict_A": false,
+    "strict_C": false
+   },
+   {
+    "idx": "609",
+    "first_div": -1,
+    "len_C": 246,
+    "len_A": 246,
+    "strict_A": true,
+    "strict_C": true
+   },
+   {
+    "idx": "652",
+    "first_div": 237,
+    "len_C": 323,
+    "len_A": 319,
+    "strict_A": false,
+    "strict_C": false
+   },
+   {
+    "idx": "695",
+    "first_div": 72,
+    "len_C": 146,
+    "len_A": 146,
+    "strict_A": true,
+    "strict_C": false
+   },
+   {
+    "idx": "738",
+    "first_div": -1,
+    "len_C": 300,
+    "len_A": 300,
+    "strict_A": true,
+    "strict_C": true
+   },
+   {
+    "idx": "781",
+    "first_div": -1,
+    "len_C": 221,
+    "len_A": 221,
+    "strict_A": false,
+    "strict_C": false
+   },
+   {
+    "idx": "824",
+    "first_div": 102,
+    "len_C": 234,
+    "len_A": 230,
+    "strict_A": true,
+    "strict_C": false
+   },
+   {
+    "idx": "867",
+    "first_div": -1,
+    "len_C": 164,
+    "len_A": 164,
+    "strict_A": true,
+    "strict_C": true
+   },
+   {
+    "idx": "910",
+    "first_div": 252,
+    "len_C": 254,
+    "len_A": 265,
+    "strict_A": true,
+    "strict_C": true
+   },
+   {
+    "idx": "953",
+    "first_div": -1,
+    "len_C": 384,
+    "len_A": 384,
+    "strict_A": false,
+    "strict_C": false
+   },
+   {
+    "idx": "996",
+    "first_div": 331,
+    "len_C": 353,
+    "len_A": 352,
+    "strict_A": false,
+    "strict_C": false
+   },
+   {
+    "idx": "1039",
+    "first_div": -1,
+    "len_C": 384,
+    "len_A": 384,
+    "strict_A": true,
+    "strict_C": true
+   },
+   {
+    "idx": "1082",
+    "first_div": -1,
+    "len_C": 292,
+    "len_A": 292,
+    "strict_A": false,
+    "strict_C": false
+   },
+   {
+    "idx": "1125",
+    "first_div": 67,
+    "len_C": 228,
+    "len_A": 204,
+    "strict_A": false,
+    "strict_C": false
+   },
+   {
+    "idx": "1168",
+    "first_div": -1,
+    "len_C": 357,
+    "len_A": 357,
+    "strict_A": true,
+    "strict_C": true
+   },
+   {
+    "idx": "1211",
+    "first_div": 164,
+    "len_C": 278,
+    "len_A": 278,
+    "strict_A": true,
+    "strict_C": false
+   },
+   {
+    "idx": "1254",
+    "first_div": -1,
+    "len_C": 279,
+    "len_A": 279,
+    "strict_A": true,
+    "strict_C": true
+   }
+  ]
  },
  "verdict": "THEORY WORKS, SPEED NEUTRAL AT CURRENT FIRE RATE. (1) Compile: Qwen2.5-0.5B -> NCM genius weights (4 parallel multi-token heads, 168KB RAM-resident) compiled closed-form in 81.7s data->weights (87.1s incl. model load), bit-identical on recompile, single 460s slice. (2) Correctness: genius-block generation with the verify/reason pass is token-identical to autoregressive on 30/30 items (29/30) at equal strict accuracy 50.0% - acceptance 93.8% when fired, so multi-token blocks are genuinely usable. (3) Speed: 8.25 vs 8.35 tok/s = 0.988x (MARGINAL, not >= 1.10x): the frozen fire rule triggers on 5.3% of steps, so AR fallback dominates. (4) Removing the reasoning step (C) speeds nothing meaningful (1.016x) and costs 16.7pp accuracy (33.3% vs 50.0%) - 'generate many tokens together THEN reason over them' is the right architecture; trusting the genius block blind is not. HONEST BOTTOM LINE: the NCM mechanism is real and accuracy-safe; tok/s gain on CPU is currently ~1x because the confidence gate fires rarely. The lever for the big run is more probe data into the same closed-form compile plus higher digit-density answering format, not a protocol change.",
  "honest_notes": [
