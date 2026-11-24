@@ -1,0 +1,129 @@
+{
+ "version": "ncm_a1",
+ "date": "2026-11-24",
+ "prereg": "download/wspl_ncm_a1_prereg.json (frozen 11:06, amendments 1-2 inline, voided slices disclosed - no results reported from them)",
+ "sha256": {
+  "prereg": "c9adb8dba88dc2c8845029c4006ee7d19c0f0e9cae172f8519bb774023e2e086",
+  "pool_state": "10540cae2e6f3cad8cecee506d633256c244e35135d1c15f673d3244c7ff57d1",
+  "eval_script": "c398374fd6581c2fef10ccc302eef08f5beabcdaaef6be791654c51b98c5babf",
+  "assemble_script": "98a2fedb133a02577ff2cf3eb501b4dffa79b1cd140fd9206a8805af01308ac6",
+  "model_safetensors": "fdf756fa7fcbe7404d5c60e26bff1a0c8b8aa1f72ced49e7dd0210fe288fb7fe",
+  "genius_heads": "d2885e6bf7a73106ff60aaa844c2004cb3415a4d12739f741167e419a205176f"
+ },
+ "environment": {
+  "torch": "2.15.0+cpu",
+  "transformers": "5.24.0",
+  "threads": 2,
+  "dtype": "float32",
+  "note": "sandbox recycled mid-run: torch/transformers/scipy reinstalled, model.safetensors re-fetched and SHA re-verified (GATE-3 PASS), gsm8k disk cache rebuilt (frozen-30 gold parse 30/30); pool state resumed from item 265, no rerun of finished items"
+ },
+ "gates": {
+  "GATE-3_model_identity": "PASS (sha fdf756fa... == frozen)",
+  "GATE-H_heads_identity": "PASS (sha d2885e6b... == frozen)",
+  "GATE-0_gold_alignment": "PASS 30/30",
+  "GATE-alpha0_anchor": "PASS 30/30 bit-identical to BR-1 arm-A ids (same prompt, same greedy; batched-forward fp differences did not flip a single token)"
+ },
+ "generation": {
+  "items": 30,
+  "K": 4,
+  "row_spec_frozen": ["anchor_greedy_a0", "genius_mixed_greedy_a4", "sample_T0.8", "sample_T1.0"],
+  "tokens_total": 25034,
+  "wall_total_s": 2512.53,
+  "forwards_total": 9609,
+  "tokens_per_forward": 2.605,
+  "avg_wall_per_item_s": 83.75,
+  "wall_multiplier_vs_A_br": 2.71
+ },
+ "rows": {
+  "anchor_greedy_a0": {"strict": 11, "acc": 0.3667},
+  "genius_mixed_greedy_a4": {"strict": 11, "acc": 0.3667},
+  "sample_T0.8": {"strict": 6, "acc": 0.2},
+  "sample_T1.0": {"strict": 5, "acc": 0.1667}
+ },
+ "selection": {
+  "rule_genius": "argmax mean(agreement_t*conf_t) over generated tokens; zero-U -> -inf; ties -> lowest row index (disclosed)",
+  "rule_logprob": "argmax mean full-vocab logprob (length-normalized)",
+  "rule_fusion": "z(genius)+z(logprob) across K=4; constant score -> z=0; -inf rows excluded from z stats, get -inf fusion (disclosed)",
+  "acc": {"sel_genius": 0.3667, "sel_logprob": 0.3667, "sel_fusion": 0.3667},
+  "strict_counts": {"sel_genius": 11, "sel_logprob": 11, "sel_fusion": 11},
+  "per_item": [
+   {"idx": 7, "gold": 160.0, "preds": [100.0, 2e+306, 200.0, 96.8], "stricts": [false, false, false, false], "genius_scores": [0.2443, 0.634853, 0.164812, 0.119103], "logprob_scores": [-0.183907, -0.136383, -0.399737, -1.763413], "n_U_tokens": [71, 329, 77, 95], "sel_genius_row": 1, "sel_logprob_row": 1, "sel_fusion_row": 1, "winner_strict": false},
+   {"idx": 50, "gold": 294.0, "preds": [292.0, 2056.0, 480.0, 21.0], "stricts": [false, false, false, false], "genius_scores": [0.170114, 0.138634, 0.159063, 0.115606], "logprob_scores": [-0.131443, -0.139517, -0.430195, -1.393032], "n_U_tokens": [37, 55, 36, 74], "sel_genius_row": 0, "sel_logprob_row": 0, "sel_fusion_row": 0, "winner_strict": false},
+   {"idx": 93, "gold": 36.0, "preds": [40.0, Infinity, 34.2, 1.0], "stricts": [false, false, false, false], "genius_scores": [0.16056, 0.766087, 0.144903, 0.134016], "logprob_scores": [-0.224665, -0.111167, -0.519096, -0.832874], "n_U_tokens": [63, 350, 47, 72], "sel_genius_row": 1, "sel_logprob_row": 1, "sel_fusion_row": 1, "winner_strict": false},
+   {"idx": 136, "gold": 6.0, "preds": [6.0, 10.0, 6.0, 6.0], "stricts": [true, false, true, true], "genius_scores": [0.086132, 0.363516, 0.140692, 0.091948], "logprob_scores": [-0.115979, -0.517206, -0.443588, -0.938779], "n_U_tokens": [12, 25, 11, 14], "sel_genius_row": 1, "sel_logprob_row": 0, "sel_fusion_row": 1, "winner_strict": false},
+   {"idx": 179, "gold": 130.0, "preds": [130.0, 130.0, 100.0, 90.0], "stricts": [true, true, false, false], "genius_scores": [0.175792, 0.65973, 0.152326, 0.087539], "logprob_scores": [-0.140338, -0.28157, -0.802495, -0.804831], "n_U_tokens": [24, 24, 19, 31], "sel_genius_row": 1, "sel_logprob_row": 0, "sel_fusion_row": 1, "winner_strict": true},
+   {"idx": 222, "gold": 140.0, "preds": [140.0, 140.0, 140.0, 140.0], "stricts": [true, true, true, true], "genius_scores": [0.180369, 0.162062, 0.166478, 0.101737], "logprob_scores": [-0.127552, -0.162503, -0.255862, -1.108614], "n_U_tokens": [21, 27, 23, 31], "sel_genius_row": 0, "sel_logprob_row": 0, "sel_fusion_row": 0, "winner_strict": true},
+   {"idx": 265, "gold": 9500.0, "preds": [10075.0, 9500.0, 400000.0, 192000.0], "stricts": [false, true, false, false], "genius_scores": [0.353154, 0.396253, 0.360374, 0.141508], "logprob_scores": [-0.124606, -0.113002, -0.19361, -0.87363], "n_U_tokens": [130, 139, 122, 50], "sel_genius_row": 1, "sel_logprob_row": 1, "sel_fusion_row": 1, "winner_strict": true},
+   {"idx": 308, "gold": 6.0, "preds": [17.0, 16.0, 1.5, 14.0], "stricts": [false, false, false, false], "genius_scores": [0.171316, 0.416958, 0.156666, 0.161067], "logprob_scores": [-0.175831, -0.203777, -0.508498, -1.311876], "n_U_tokens": [33, 26, 42, 79], "sel_genius_row": 1, "sel_logprob_row": 0, "sel_fusion_row": 1, "winner_strict": false},
+   {"idx": 351, "gold": 10.0, "preds": [10.0, 10.0, 90.0, 89.0], "stricts": [true, true, false, false], "genius_scores": [0.149782, 0.25888, 0.219156, 0.161871], "logprob_scores": [-0.19617, -0.163383, -0.39173, -0.742056], "n_U_tokens": [33, 31, 26, 72], "sel_genius_row": 1, "sel_logprob_row": 1, "sel_fusion_row": 1, "winner_strict": true},
+   {"idx": 394, "gold": 92.0, "preds": [0.0, 14.0, 60.0, 68.0], "stricts": [false, false, false, false], "genius_scores": [0.106661, 0.157776, 0.165048, 0.280462], "logprob_scores": [-0.243596, -0.155808, -0.462881, -0.965584], "n_U_tokens": [22, 79, 18, 16], "sel_genius_row": 3, "sel_logprob_row": 1, "sel_fusion_row": 1, "winner_strict": false},
+   {"idx": 437, "gold": 7.0, "preds": [8.0, 3.0, 33.0, 0.87], "stricts": [false, false, false, false], "genius_scores": [0.133007, 0.597256, 0.144339, 0.166905], "logprob_scores": [-0.354717, -0.245381, -0.553475, -0.493821], "n_U_tokens": [21, 296, 23, 37], "sel_genius_row": 1, "sel_logprob_row": 1, "sel_fusion_row": 1, "winner_strict": false},
+   {"idx": 480, "gold": 11.0, "preds": [12.0, 11.0, 11.0, 15.0], "stricts": [false, true, true, false], "genius_scores": [0.091773, 0.11544, 0.07443, 0.089048], "logprob_scores": [-0.135618, -0.149421, -0.235542, -2.121361], "n_U_tokens": [22, 25, 21, 38], "sel_genius_row": 1, "sel_logprob_row": 0, "sel_fusion_row": 1, "winner_strict": true},
+   {"idx": 523, "gold": 74.0, "preds": [107.0, 62.0, 64.0, 68.0], "stricts": [false, false, false, false], "genius_scores": [0.219437, 0.156743, 0.139994, 0.142694], "logprob_scores": [-0.829742, -0.131997, -0.228816, -1.003132], "n_U_tokens": [4, 40, 35, 40], "sel_genius_row": 0, "sel_logprob_row": 1, "sel_fusion_row": 0, "winner_strict": false},
+   {"idx": 566, "gold": 10.0, "preds": [11.0, -109.0, 17.0, 44.0], "stricts": [false, false, false, false], "genius_scores": [0.177366, 0.456525, 0.128542, 0.112379], "logprob_scores": [-0.986146, -0.263127, -0.259187, -1.666194], "n_U_tokens": [3, 32, 35, 37], "sel_genius_row": 1, "sel_logprob_row": 2, "sel_fusion_row": 1, "winner_strict": false},
+   {"idx": 609, "gold": 7.0, "preds": [4.0, 1.0, 7.0, 10.0], "stricts": [false, false, true, false], "genius_scores": [0.145907, 0.654362, 0.088438, 0.116791], "logprob_scores": [-0.175709, -0.088086, -0.269449, -1.457094], "n_U_tokens": [37, 384, 26, 3], "sel_genius_row": 1, "sel_logprob_row": 1, "sel_fusion_row": 1, "winner_strict": false},
+   {"idx": 652, "gold": 75.0, "preds": [30.0, 1.0, 455.0, 16.875], "stricts": [false, false, false, false], "genius_scores": [0.107714, 0.626046, 0.350087, 0.20386], "logprob_scores": [-0.304064, -0.124491, -0.263222, -0.60659], "n_U_tokens": [22, 374, 47, 73], "sel_genius_row": 1, "sel_logprob_row": 1, "sel_fusion_row": 1, "winner_strict": false},
+   {"idx": 695, "gold": 5.0, "preds": [2.0, Infinity, 8.0, 72.0], "stricts": [false, false, false, false], "genius_scores": [0.481335, 0.810993, 0.212119, 0.180537], "logprob_scores": [-0.255605, -0.064579, -0.201345, -0.586354], "n_U_tokens": [20, 384, 40, 21], "sel_genius_row": 1, "sel_logprob_row": 1, "sel_fusion_row": 1, "winner_strict": false},
+   {"idx": 738, "gold": 4.0, "preds": [4.0, 4.0, 20.0, 4.0], "stricts": [true, true, false, true], "genius_scores": [0.175354, 0.176315, 0.169517, 0.17088], "logprob_scores": [-0.139072, -0.1423, -0.283316, -0.368192], "n_U_tokens": [32, 31, 40, 28], "sel_genius_row": 1, "sel_logprob_row": 0, "sel_fusion_row": 1, "winner_strict": true},
+   {"idx": 781, "gold": 17.0, "preds": [-224.0, 17.0, 17.0, 20.0], "stricts": [false, true, true, false], "genius_scores": [0.114894, 0.427712, 0.132673, 0.092009], "logprob_scores": [-0.297626, -0.4085, -0.41174, -0.950494], "n_U_tokens": [43, 25, 59, 37], "sel_genius_row": 1, "sel_logprob_row": 0, "sel_fusion_row": 1, "winner_strict": true},
+   {"idx": 824, "gold": 52.0, "preds": [52.0, 52.0, 752.0, 74.0], "stricts": [true, true, false, false], "genius_scores": [0.129116, 0.487535, 0.333051, 0.140849], "logprob_scores": [-0.081431, -0.206641, -0.318101, -0.283939], "n_U_tokens": [23, 21, 35, 23], "sel_genius_row": 1, "sel_logprob_row": 0, "sel_fusion_row": 1, "winner_strict": true},
+   {"idx": 867, "gold": 7.0, "preds": [2.0, Infinity, 2.5, 7.0], "stricts": [false, false, false, true], "genius_scores": [0.119471, 0.848622, 0.167485, 0.087118], "logprob_scores": [-0.236475, -0.081731, -1.176157, -0.812518], "n_U_tokens": [14, 374, 3, 21], "sel_genius_row": 1, "sel_logprob_row": 1, "sel_fusion_row": 1, "winner_strict": false},
+   {"idx": 910, "gold": 700.0, "preds": [300.0, 400.0, 300.0, 320.0], "stricts": [false, false, false, false], "genius_scores": [0.50567, 0.434164, 0.418553, 0.254748], "logprob_scores": [-0.333025, -0.650976, -0.525287, -0.663762], "n_U_tokens": [4, 16, 8, 35], "sel_genius_row": 0, "sel_logprob_row": 0, "sel_fusion_row": 0, "winner_strict": false},
+   {"idx": 953, "gold": 452.0, "preds": [2.0, 5.0, 15.0, 895.0], "stricts": [false, false, false, false], "genius_scores": [0.15363, 0.54339, 0.108983, 0.169112], "logprob_scores": [-0.285545, -0.165985, -0.854331, -1.069162], "n_U_tokens": [78, 285, 54, 35], "sel_genius_row": 1, "sel_logprob_row": 1, "sel_fusion_row": 1, "winner_strict": false},
+   {"idx": 996, "gold": 3.0, "preds": [11.0, 10.0, 9.0, 10.0], "stricts": [false, false, false, false], "genius_scores": [0.163605, 0.165549, 0.124512, 0.131106], "logprob_scores": [-1.045998, -0.137367, -1.079759, -0.378723], "n_U_tokens": [3, 69, 2, 24], "sel_genius_row": 1, "sel_logprob_row": 1, "sel_fusion_row": 1, "winner_strict": false},
+   {"idx": 1039, "gold": 160.0, "preds": [160.0, 208.0, 240.0, 160.0], "stricts": [true, false, false, true], "genius_scores": [0.139436, 0.150559, 0.162695, 0.188362], "logprob_scores": [-0.138163, -0.168325, -0.248521, -0.479679], "n_U_tokens": [46, 53, 59, 55], "sel_genius_row": 3, "sel_logprob_row": 0, "sel_fusion_row": 2, "winner_strict": false},
+   {"idx": 1082, "gold": 2.0, "preds": [2.0, 2.0, 1.0, 15.0], "stricts": [true, true, false, false], "genius_scores": [0.108789, 0.122261, 0.041525, 0.137654], "logprob_scores": [-0.132896, -0.249526, -0.504058, -0.773448], "n_U_tokens": [27, 20, 11, 26], "sel_genius_row": 3, "sel_logprob_row": 0, "sel_fusion_row": 0, "winner_strict": true},
+   {"idx": 1125, "gold": 90.0, "preds": [3.0, 10.0, 3.0, 2.0], "stricts": [false, false, false, false], "genius_scores": [0.116401, 0.71757, 0.22056, 0.032402], "logprob_scores": [-0.214185, -0.072735, -0.981785, -3.282361], "n_U_tokens": [19, 384, 2, 34], "sel_genius_row": 1, "sel_logprob_row": 1, "sel_fusion_row": 1, "winner_strict": false},
+   {"idx": 1168, "gold": 20.0, "preds": [20.0, 20.0, 3.0, 15.0], "stricts": [true, true, false, false], "genius_scores": [0.161037, 0.1516, 0.119912, 0.102384], "logprob_scores": [-0.090759, -0.089818, -0.21466, -0.338118], "n_U_tokens": [53, 51, 45, 36], "sel_genius_row": 0, "sel_logprob_row": 1, "sel_fusion_row": 0, "winner_strict": true},
+   {"idx": 1211, "gold": 448.0, "preds": [448.0, 448.0, 448.0, 140.64], "stricts": [true, true, true, false], "genius_scores": [0.295943, 0.361734, 0.240361, 0.150994], "logprob_scores": [-0.22279, -0.426397, -0.460138, -0.617913], "n_U_tokens": [28, 31, 29, 72], "sel_genius_row": 1, "sel_logprob_row": 0, "sel_fusion_row": 0, "winner_strict": true},
+   {"idx": 1254, "gold": 30.0, "preds": [30.0, Infinity, 53.0, 57.0], "stricts": [true, false, false, false], "genius_scores": [0.135711, 0.87227, 0.12505, 0.075055], "logprob_scores": [-0.23887, -0.085635, -0.371242, -0.9697], "n_U_tokens": [26, 380, 48, 45], "sel_genius_row": 1, "sel_logprob_row": 1, "sel_fusion_row": 1, "winner_strict": false}
+  ],
+  "zero_U_items": 0
+ },
+ "oracle_bestof4": {
+  "count": 16,
+  "acc": 0.5333
+ },
+ "diversity": {
+  "items_ge2_distinct_preds": 29,
+  "share": 0.9667,
+  "frozen_target": 0.5
+ },
+ "speed": {
+  "aggregate_tok_s": 9.964,
+  "A_br_tok_s": 8.69,
+  "ratio": 1.1466,
+  "mechanism_note": "tokens_per_forward 1.0 (single-stream) -> 2.61 (K=4 batched): memory-bandwidth amortization works at the forward level; wall still carries 4x prefill (disclosed in prereg) and per-step row-loop overhead"
+ },
+ "salvage": {
+  "anchor_wrong_pool_has_correct": 5,
+  "recovered_by_sel_fusion": 3,
+  "anchor_correct_lost_by_sel_fusion": 3,
+  "headroom_pool": 0.1667
+ },
+ "verdict_bands_frozen": {
+  "accuracy": "best sel arm vs A_br 36.67%: SUCCESS >=46.67% | PARTIAL >=41.67% | FAIL",
+  "speed": "aggregate tok/s vs 8.69: SUCCESS >=1.5x | PARTIAL >=1.2x | FAIL",
+  "genius_signal": "sel_genius >= sel_logprob -> YES/NO",
+  "diversity": "share >=0.5 target (diagnostic, no band)"
+ },
+ "verdict": {
+  "accuracy": "FAIL (best arm sel_genius 11/30 = 36.7% vs A_br 36.7%, reference C1 verbose 50.0%)",
+  "speed": "FAIL (9.96 tok/s vs 8.69 = 1.15x)",
+  "genius_signal": "YES (sel_genius 11/30 vs sel_logprob 11/30)",
+  "hypotheses": {
+   "H-A1-speed (>=1.2x aggregate)": "REJECTED",
+   "H-A1-diversity (>=50% items)": "CONFIRMED",
+   "H-A1-acc (best sel >= +5pp over greedy, not below)": "REJECTED",
+   "H-A1-genius (sel_genius >= sel_logprob)": "CONFIRMED"
+  }
+ },
+ "honest_notes": [
+  "Answer-region interpretation: 'generated tokens' = everything the rollout emitted (prompt excluded); this is the only region captured per-step.",
+  "Tie-break not specified in prereg; numpy argmax first-index convention used (anchor row wins ties) - disclosed post-hoc, deterministic.",
+  "alpha=4 genius co-writing still degenerates on some items (2e+306/inf preds on items 7/93/695/867/1254): genius digit bias injected mid-calculation corrupts arithmetic even at alpha=4.",
+  "Batched prefill is 4x compute per item (disclosed pre-results); aggregate tok/s is the honest end-to-end number, not a decode-only number.",
+  "Sandbox recycle mid-run (between item 222 and 265): environment rebuilt + SHA gates re-passed; state resumed, zero rerun cost.",
+  "Selection arm winner counts: sel_genius=5anchor/22a4/0t08/3t10, sel_logprob=13anchor/16a4/1t08/0t10, sel_fusion=7anchor/22a4/1t08/0t10"
+ ]
+}
