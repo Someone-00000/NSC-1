@@ -1,0 +1,203 @@
+{
+ "version": "br1",
+ "date": "2026-11-24",
+ "prereg": "download/wspl_br1_prereg.json",
+ "sha256": {
+  "prereg": "f7bf5a805aefe113d9a8cf08e00021d16be04e20d00523d1f4e79d195e2e23f6",
+  "heads_npz": "d2885e6bf7a73106ff60aaa844c2004cb3415a4d12739f741167e419a205176f",
+  "model_safetensors": "fdf756fa7fcbe7404d5c60e26bff1a0c8b8aa1f72ced49e7dd0210fe288fb7fe",
+  "times_json": "96f3633af7764a28a611ae2bfbc02e2f92813cbaa69ba5206bd0b949d0663e98",
+  "state_A": "3cb203a9b29e4daeed2365816f43f5473345837dda8c2cd1bccbc37493f200cf",
+  "state_B": "e684b728d5941646a5de1e7ba4fe85c6a49ab785c22cad984a4b236d4cd4ce11",
+  "state_C": "e17d5332582f89697da9945f60ed8f8fbc3794bf9170fc17aaabcab73a695ae4",
+  "br1_build_py": "c7312b2398f8297bc1a61b378682465a9885fd35de12e8532382b5a0d101762b",
+  "br1_eval_py": "ec6c26e722fb138c3b22797765ad88b7b44c9f3c4fdb1e271dfb5355e78d4402"
+ },
+ "amendments": [
+  "amendment_0 (pre-build, disclosed in prereg): probe 192->384 items after digit-dense row-count re-estimate; per-slice budget with disclosed cache resume"
+ ],
+ "environment": {
+  "torch": "2.15.0+cpu",
+  "transformers": "5.24.0",
+  "threads": 2,
+  "dtype": "float32",
+  "device": "CPU only",
+  "model": "Qwen/Qwen2.5-0.5B-Instruct 494M params",
+  "model_recovered": "model.safetensors lost in sandbox recycle 2026-11-24; re-downloaded; sha256 verified == frozen identity before any build (GATE-3 PASS)"
+ },
+ "gates": {
+  "GATE-3_model_identity": "PASS: sha256 fdf756fa...88fb7fe == prereg-frozen identity (re-download after recycle)",
+  "GATE-0_gold_alignment": "30/30 PASS",
+  "GATE-1_probe": "PASS: 13874 rows >= 12000; universe verified",
+  "GATE-det": "PASS: max|dW|=0.0, max|dB|=0.0, lambda/tau identical on full recompile",
+  "GATE-slices": "probe used 2 foreground slices (445s + 48s), resume disclosed; per-slice <= 460s PASS"
+ },
+ "compile_S1": {
+  "probe_rows": 13874,
+  "probe_forwards_total": 70,
+  "compile_s": 8.066,
+  "recompile_s": 8.034,
+  "heads_bytes": 328327,
+  "note": "compile 8.07s for 8 horizons x 12 classes on 13874 rows (LU-cached closed-form solve); C1 took 10.88s for 4 horizons on 4297 rows - the scaled compile is FASTER per horizon-row",
+  "val_acc_trainfit_inU": {
+   "H1": 0.8900994789199431,
+   "H2": 0.6101373756513501,
+   "H3": 0.49577464788732395,
+   "H4": 0.4528564793311658,
+   "H5": 0.4183579335793358,
+   "H6": 0.4039341262580055,
+   "H7": 0.40390731485688325,
+   "H8": 0.40117593848937133
+  },
+  "tau": {
+   "H1": 0.938,
+   "H2": 0.737,
+   "H3": 0.588,
+   "H4": 0.51,
+   "H5": 0.462,
+   "H6": 0.491,
+   "H7": 0.516,
+   "H8": 0.557
+  },
+  "lambda": {
+   "H1": 100.0,
+   "H2": 1.0,
+   "H3": 100.0,
+   "H4": 100.0,
+   "H5": 100.0,
+   "H6": 100.0,
+   "H7": 100.0,
+   "H8": 100.0
+  }
+ },
+ "speed_S2": {
+  "A": {
+   "arm": "A",
+   "n": 30,
+   "strict": 0.36666666666666664,
+   "tokens": 5419,
+   "wall_gen_s": 623.6,
+   "tok_per_s": 8.69,
+   "forwards": 5419,
+   "counters": {
+    "forwards": 5419,
+    "fires": 0,
+    "proposals": 0,
+    "accepted": 0,
+    "fallbacks": 0,
+    "fire_steps": 0,
+    "steps": 5419
+   }
+  },
+  "B": {
+   "arm": "B",
+   "n": 30,
+   "strict": 0.36666666666666664,
+   "tokens": 5731,
+   "wall_gen_s": 652.8,
+   "tok_per_s": 8.78,
+   "forwards": 5680,
+   "counters": {
+    "forwards": 5680,
+    "fires": 473,
+    "proposals": 473,
+    "accepted": 426,
+    "fallbacks": 4911,
+    "fire_steps": 372,
+    "steps": 5305
+   }
+  },
+  "C": {
+   "arm": "C",
+   "n": 30,
+   "strict": 0.26666666666666666,
+   "tokens": 5304,
+   "wall_gen_s": 580.7,
+   "tok_per_s": 9.13,
+   "forwards": 5169,
+   "counters": {
+    "forwards": 5169,
+    "fires": 601,
+    "proposals": 601,
+    "accepted": 0,
+    "fallbacks": 4680,
+    "fire_steps": 459,
+    "steps": 5162
+   }
+  }
+ },
+ "ratio_B_vs_A": 1.0104,
+ "ratio_C_vs_A": 1.0506,
+ "B_mechanism": {
+  "fire_rate_of_steps": 0.0701,
+  "acceptance_rate_when_fired": 0.9006,
+  "avg_tokens_per_fire_iteration": 2.15,
+  "fwd_per_tok": 0.9911,
+  "token_identical_to_A": "28/30"
+ },
+ "C_divergence": {
+  "items_diverged_from_A": 19,
+  "strict_agreement_with_A": 27
+ },
+ "divergence_detail_B": [
+  {
+   "idx": 222,
+   "first_div": 111,
+   "len_arm": 384,
+   "strict_arm": true,
+   "strict_A": true,
+   "pred_arm": 140.0,
+   "pred_A": 140.0
+  },
+  {
+   "idx": 1211,
+   "first_div": 80,
+   "len_arm": 119,
+   "strict_arm": true,
+   "strict_A": true,
+   "pred_arm": 448.0,
+   "pred_A": 448.0
+  }
+ ],
+ "accuracy_S3": {
+  "A_strict_acc": 0.36666666666666664,
+  "B_strict_acc": 0.36666666666666664,
+  "C_strict_acc": 0.26666666666666666,
+  "B_equals_A": true,
+  "C_drop_pp": 10.0
+ },
+ "c1_comparison": {
+  "C1_A": {
+   "strict": 0.5,
+   "tok_s": 8.35
+  },
+  "C1_B": {
+   "strict": 0.5,
+   "tok_s": 8.25,
+   "ratio": 0.988,
+   "fire_rate": 0.0529,
+   "acceptance": 0.9377,
+   "avg_tok_per_fire": 2.25
+  },
+  "C1_C": {
+   "strict": 0.3333,
+   "tok_s": 8.48,
+   "ratio": 1.0156
+  },
+  "br1_A_strict_delta_pp": -13.3
+ },
+ "verdict": "THEORY HOLDS AT SCALE, SPEED STILL NEUTRAL, DIGIT-DENSE LEVER REJECTED AT THE FIRE-RATE BAR. (1) Compile scaled and got FASTER: 13874 probe rows (3.2x C1), 8 horizons (2x C1), closed-form compile 8.07s, bit-exact recompile, heads 321KB RAM-resident; probe crossed 2 slices (445s+48s) with disclosed resume, every slice <= 460s. (2) Verify/reason generation stays accuracy-exact: B strict 0.3667 == A strict 0.3667 (0.0pp difference), 28/30 token-identical (divergences are fp near-tie argmax flips, not mechanism errors). (3) Speed ratio B/A = 1.0104 (MARGINAL band [0.95,1.10)): fire rate rose 5.29% -> 7.01% but stays under the 8% partial bar -> H1 lever REJECTED per frozen band; acceptance 0.901 and avg 2.15 tokens/fire-iteration mean verify overhead still cancels block savings. (4) The digit-dense format COSTS the base model: A strict 36.7% vs C1 verbose 50.0% (-13.3pp, outside the frozen +/-10pp stability band -> H4 FAIL); C blind-fire drops to 0.2667 (-10.0pp) re-confirming the reason-over-blocks step is necessary. HONEST BOTTOM LINE: more data into the same closed-form compile scales cleanly and cheaply (this is the data->weight side of the big run working), but the tok/s win needs a different lever than format: the fire/tau policy (lower tau with acceptance-aware budget) or batched verify, not more probe rows.",
+ "hypotheses": {
+  "H1_fire": "REJECTED (0.0701 < 0.08 partial bar)",
+  "H2_speed": "REJECTED (ratio 1.0104 < 1.10; MARGINAL)",
+  "H3_accuracy": "SUPPORTED (B == A strict exactly, 0.0pp; 28/30 token-identical)",
+  "H4_stability": "REJECTED (A_br 36.7% vs C1 50.0%, -13.3pp outside +/-10pp band)"
+ },
+ "honest_notes": [
+  "2/30 B items diverge from A (fp near-tie argmax flips in the batched verify forward vs single-token forwards); strict still equal on both - same phenomenon as C1 (29/30)",
+  "fires concentrate in digit runs, but H2 tau (0.737) cuts blocks to ~1 extra token on average; consecutive-confidence rule is the binding constraint, not head quality",
+  "digit-dense format shortens generations (181 tok/item vs 269 in C1) and raises tok/s floor (8.69 vs 8.35) for BOTH arms - the ratio is the honest comparison",
+  "smoke-test states were wiped before full runs; arms run with per-item checkpoint/resume across slices; C1 probe cache (48 items) untouched and distinct from BR-1 cache (384 items)",
+  "C arm acceptance is 0 by definition (blind); its fire rate 8.89% reflects that without verification the loop keeps re-firing on drifted states"
+ ]
+}

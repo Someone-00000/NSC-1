@@ -1,0 +1,82 @@
+{
+ "model_load_s": 5.881,
+ "gate3_model_sha_check_s": 29.19,
+ "probe_forwards": 1,
+ "probe_rows": 13874,
+ "probe_s_this_slice": 4.284,
+ "probe_resumed_from_cache": true,
+ "compile_s": 8.066,
+ "recompile_s": 8.034,
+ "heads_bytes": 328327,
+ "sha256_prereg": "f7bf5a805aefe113d9a8cf08e00021d16be04e20d00523d1f4e79d195e2e23f6",
+ "sha256_heads": "d2885e6bf7a73106ff60aaa844c2004cb3415a4d12739f741167e419a205176f",
+ "sha256_model_safetensors": "fdf756fa7fcbe7404d5c60e26bff1a0c8b8aa1f72ced49e7dd0210fe288fb7fe",
+ "gate0_gold_alignment_pass": true,
+ "gate1_rows_ge_12000": true,
+ "val_stats": {
+  "1": {
+   "val_acc_inU_trainfit": 0.8900994789199431,
+   "lambda": 100.0,
+   "tau": 0.9378160787990406,
+   "n_val_inU": 2111,
+   "n_correct_val_final_head": 1932
+  },
+  "2": {
+   "val_acc_inU_trainfit": 0.6101373756513501,
+   "lambda": 1.0,
+   "tau": 0.7371887248999167,
+   "n_val_inU": 2111,
+   "n_correct_val_final_head": 1456
+  },
+  "3": {
+   "val_acc_inU_trainfit": 0.49577464788732395,
+   "lambda": 100.0,
+   "tau": 0.5878974535364971,
+   "n_val_inU": 2130,
+   "n_correct_val_final_head": 1283
+  },
+  "4": {
+   "val_acc_inU_trainfit": 0.4528564793311658,
+   "lambda": 100.0,
+   "tau": 0.5099863866005417,
+   "n_val_inU": 2153,
+   "n_correct_val_final_head": 1237
+  },
+  "5": {
+   "val_acc_inU_trainfit": 0.4183579335793358,
+   "lambda": 100.0,
+   "tau": 0.4624798355020668,
+   "n_val_inU": 2168,
+   "n_correct_val_final_head": 1204
+  },
+  "6": {
+   "val_acc_inU_trainfit": 0.4039341262580055,
+   "lambda": 100.0,
+   "tau": 0.4912925416308427,
+   "n_val_inU": 2186,
+   "n_correct_val_final_head": 1180
+  },
+  "7": {
+   "val_acc_inU_trainfit": 0.40390731485688325,
+   "lambda": 100.0,
+   "tau": 0.5157267552468109,
+   "n_val_inU": 2201,
+   "n_correct_val_final_head": 1169
+  },
+  "8": {
+   "val_acc_inU_trainfit": 0.40117593848937133,
+   "lambda": 100.0,
+   "tau": 0.5573705851737565,
+   "n_val_inU": 2211,
+   "n_correct_val_final_head": 1146
+  }
+ },
+ "determinism": {
+  "max_abs_W_diff": 0.0,
+  "max_abs_B_diff": 0.0,
+  "lambda_same": true,
+  "tau_same": true
+ },
+ "threads": 2,
+ "dtype": "float32"
+}

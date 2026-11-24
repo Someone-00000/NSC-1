@@ -1,0 +1,77 @@
+{
+ "version": "br1",
+ "date": "2026-11-24",
+ "frozen_before_any_build_or_eval": true,
+ "experiment_name": "BR-1: big-run v1 - scaled digit-dense closed-form compile (192 probe items, H1..H8) + genius-RAM multi-token block speed/accuracy arms",
+ "parent": "ncm_c1 (verdict: THEORY WORKS, SPEED NEUTRAL AT CURRENT FIRE RATE; big-run lever = more probe data + higher digit-token density, no protocol change)",
+ "model_frozen": {
+  "path": "/home/z/my-project/models/qwen25-05b",
+  "file": "model.safetensors",
+  "expected_size_bytes": 988097824,
+  "expected_sha256": "fdf756fa7fcbe7404d5c60e26bff1a0c8b8aa1f72ced49e7dd0210fe288fb7fe",
+  "hf_repo": "Qwen/Qwen2.5-0.5B-Instruct",
+  "note": "file lost in sandbox recycle on 2026-11-24; re-downloaded and MUST re-verify SHA before any build (GATE-3)."
+ },
+ "no_gradients": true,
+ "change_log_vs_c1_frozen_in_advance": [
+  "probe items 48 -> 384 (indices 3+17*k, k=0..383; superset of C1 probe, train pool only)",
+  "probe target style: digit-dense - per answer line, emit each <<expr=result>> calculator annotation as its own line 'expr=result', drop prose lines, keep '#### N' verbatim (deterministic regex transform)",
+  "eval exemplar style: same digit-dense transform applied to train items 0,1; instruction asks for short one-per-line calculations ending with '#### <answer>'",
+  "horizons 4 -> 8 (H1..H8), same consecutive-confident-block fire rule",
+  "eval item set and indices UNCHANGED (30 items, indices 7+43*k); max_new 384 UNCHANGED; greedy fp32 threads=2 UNCHANGED"
+ ],
+ "amendment_0_pre_build_disclosed": {
+  "reason": "digit-dense targets shorten per-item answer regions (~90 -> ~35 positions), so 192 items would under-run the frozen 12000-row gate; row count re-estimated before any build executed",
+  "change": "probe items 192 -> 384; S1 budget redefined per-slice (each foreground slice <= 460 s, probe-part cache resume allowed and disclosed) instead of single-slice total"
+ },
+ "compile_protocol_frozen": {
+  "probe_max_len": 256,
+  "probe_batch_positions_budget": 1800,
+  "rows": "answer-region positions only; h_t = final layer hidden at position t (float32); targets = token ids t+1..t+8 (EOS appended so tail positions have targets)",
+  "token_universe_U_frozen": {
+   "rule": "digit tokens plus answer-boundary tokens; ids asserted at build",
+   "expected_ids": {"0": 15, "1": 16, "2": 17, "3": 18, "4": 19, "5": 20, "6": 21, "7": 22, "8": 23, "9": 24, "\\n": 198, "eos": 151645},
+   "n_classes": 12
+  },
+  "heads": "for each horizon k in {1..8}: one-vs-all ridge logistic per class (closed-form solve, no gradients); standardized features (mu/sd from probe rows) + unregularized bias; lambda grid {1,10,100} selected by probe-val accuracy on last 20% of rows (tie -> larger lambda); final refit on all valid rows; tau_k = 60th percentile of max-logit confidence on correct val rows",
+  "determinism_gate": "full recompile from cached probe rows must give max|dW|=0 and max|dB|=0 and identical lambda/tau"
+ },
+ "build_gates_frozen": {
+  "GATE-3_model_identity": "sha256(model.safetensors) == fdf756fa...88fb7fe before build starts",
+  "GATE-0_gold_alignment": "30/30 eval indices: state golds == dataset '#### N'",
+  "GATE-1_probe": ">= 12000 probe rows; universe ids verified",
+  "GATE-det": "determinism bit-exact",
+  "S1_build_budget": "total incl. model load <= 460 s in a single foreground slice; probe-part cache resume allowed and must be disclosed in times json"
+ },
+ "eval_protocol_frozen": {
+  "arms": {
+   "A_br": "plain autoregressive greedy, digit-dense prompt (baseline)",
+   "B_br": "genius block + verify/reason pass (identical to C1 arm B rule, horizons 1..8): propose consecutive-confident block; verify against base-model greedy argmax chain with ONE extra forward; accept longest agreeing prefix + 1 bonus token; outputs MUST be token-identical to A_br",
+   "C_br": "genius blind fire, no verify (diagnostic only, expected to diverge)"
+  },
+  "items": "GSM8K test indices [7+43*k for k in 0..29] (same 30 as C1); strict = single extracted '#### N' == gold, abstention counts wrong",
+  "max_new_tokens": 384,
+  "primary_metrics": [
+   "S2 speed: tok_per_s per arm over completed items; ratio = tok_s(B_br)/tok_s(A_br)",
+   "S3 accuracy: strict_acc per arm; B_br vs A_br delta (must be 0.0pp by construction)",
+   "fire_rate = fire_steps/steps (B_br); acceptance = accepted/proposals (B_br)"
+  ],
+  "verdict_bands_frozen": {
+   "speed": "ratio >= 1.10 SUCCESS; 0.95 <= ratio < 1.10 MARGINAL; ratio < 0.95 FAIL",
+   "accuracy": "B_br strict_acc == A_br strict_acc AND >= 29/30 token-identical -> THEORY HOLDS AT SCALE; else FAIL",
+   "fire_rate": "fire_rate >= 0.15 -> lever CONFIRMED (vs C1 0.0529); 0.08 <= fr < 0.15 PARTIAL; fr < 0.08 lever REJECTED",
+   "stability": "A_br strict vs C1 arm-A strict (0.50) reported as intelligence-stability delta of the digit-dense format"
+  },
+  "hypotheses": {
+   "H1_fire": "digit-dense format + distribution-matched probe raises fire rate to >= 0.15 of steps",
+   "H2_speed": "at fire_rate >= 0.15 with longer blocks (H1..H8), B_br/A_br >= 1.10 (C1: 0.988)",
+   "H3_accuracy": "B_br stays token-identical to A_br (accuracy difference 0.0pp) while C_br drops (verify/reason step is necessary)",
+   "H4_stability": "A_br strict within +/-10pp of C1 arm-A (0.50) - digit-dense format does not destabilize the base model"
+  }
+ },
+ "tracking": {
+  "artifacts_planned": ["wspl_br1_prereg.json", "wspl_br1_compile_times.json", "wspl_br1_heads.npz", "wspl_br1_results.json", "br1_build.py", "br1_eval.py", "docs/BR1.md"],
+  "push_policy": "prereg pushed to GitHub NSC-1 before eval arms start; results+times pushed after verdict; heads.npz binary stays sandbox-side with SHA recorded"
+ },
+ "amendments": []
+}
