@@ -1,0 +1,46 @@
+{
+ "version": "br2",
+ "date": "2026-11-24",
+ "frozen_before_any_eval": true,
+ "experiment_name": "BR-2: multiple whole answers generated together, genius weights reason over them and refine into ONE answer (user directive)",
+ "user_theory": "(a) generate multiple ANSWERS together (not one token at a time - whole answers); (b) mix genius weights with the model's normal weights so both hold context together; (c) genius reasons over the candidate answers and refines them into one final answer. Win condition: accuracy goes UP (not down) vs single-answer baseline.",
+ "parent_results": {
+  "br1_arm_A_strict": 0.36666666666666664,
+  "br1_arm_A_tok_s": 8.69,
+  "br1_arm_A_wall_per_item_s": 20.79,
+  "c1_arm_A_strict": 0.50,
+  "heads": "download/wspl_br1_heads.npz sha256 d2885e6bf7a73106ff60aaa844c2004cb3415a4d12739f741167e419a205176f (H1..H8, digit-dense trained)",
+  "prompt": "identical digit-dense prompt as BR-1 (br1_eval.py user_content, exemplars train 0,1 digit-dense)"
+ },
+ "no_gradients": true,
+ "design_rationale": {
+  "interpretation_of_mixing": "genius heads are 896->12 classifiers over the frozen token universe U (digits/newline/eos); the model lm_head is 896->151936. Literal addition into lm_head is undefined for 151,924 tokens genius never saw, so 'mixing' is implemented at two frozen, disclosed levels: (L1) decision-level mix - final answer = weighted vote where each candidate's weight s = beta*genius_score + (1-beta)*model_score (beta=0.5: both signals hold equal weight = 'equal amount of context'); (L2) generation-level mix (arm M4) - genius logits are literally ADDED into model logits at confident steps. Full-vocab genius heads would need a ~550MB closed-form compile (897x151936) - deferred, disclosed.",
+  "why_scoring_is_free": "during generation every step already computes h_t and logits; genius z-scores are one 896x12 matmul per step (~67k flops, negligible). No extra forwards."
+ },
+ "arms_frozen": {
+  "M0_baseline": "single greedy answer - REUSED from BR-1 arm A (bit-identical prompt/model/op-order; state realbench_cache/br1_eval/state_A.json sha256 49aeacc646f3969eecec2792838b6d8ac157cf012f09349bc59a05520dd3a940->recomputed at assemble; no rerun, disclosed as reuse)",
+  "MGEN_shared_candidates": "per item, K=4 whole answers generated with the SAME BR-1 prompt: cand 0 = greedy; cand 1..3 = sampled with temperature T=0.7, pure temperature (no top-k/top-p), torch.Generator(cpu).manual_seed(1000003 + idx*7919 + cand). max_new=384, fp32, threads=2. For every generated token y_t at answer position: record (a) genius H1 prob of y_t = softmax(W0 h + b0)[y_t] over U (skip non-U tokens), (b) model logprob of y_t under full-vocab log_softmax. Per candidate: genius_score = mean of (a) (0.0 if no U tokens), model_score = mean of (b), pred = extract_ans (#### first, else last number, same regex as BR-1), n_tokens, wall_s. Candidates checkpointed per-candidate for slice resume.",
+  "M1_primary": "genius+model mixed refinement (beta=0.5): min-max normalize genius_score and model_score within the item's non-abstaining candidates; s_i = 0.5*gn_i + 0.5*lp_i; group candidates by pred value; group weight = sum of s_i; winner = argmax group weight; ties -> group containing max s_i -> then lower numeric value; final pred = winner group's value; abstain (all None) = wrong",
+  "M2_control": "pure self-consistency: majority vote by count among non-abstaining candidates; ties -> higher mean model_score -> lower value; isolates what the genius signal adds beyond voting",
+  "M3_diagnostic": "genius-only refinement (beta=1.0): same rule as M1 with s_i = gn_i; shows whether genius alone can refine",
+  "M4_generation_mix": "literal weight-mixing during generation: at each step, if genius H1 softmax max-conf >= tau_1 (0.938 from BR-1 heads), next token = argmax over U of ( z_model[U] + 2.0 * standardized z1 ) else next = argmax full-vocab z_model; gamma=2.0 frozen (arbitrary but fixed, disclosed); greedy-style, 1 answer per item"
+ },
+ "eval_protocol_frozen": {
+  "items": "GSM8K test indices [7+43*k for k in 0..29] (same 30 as C1/BR-1); strict = extracted value == gold, abstention counts wrong",
+  "max_new_tokens": 384,
+  "primary_metric": "strict accuracy of M1 vs M0 on the 30 items",
+  "secondary": "M2/M3/M4 strict; wall-clock per item per arm; effective tok/s (total generated tokens across candidates / wall)",
+  "hypotheses_bands_frozen": {
+   "H_A_accuracy": "M1 vs M0 (0.3667): SUCCESS >= 14/30 (46.7%, +10pp); PARTIAL = 13/30 (43.3%, +6.7pp); FAIL <= 12/30",
+   "H_B_genius_adds": "M1 - M2: >= +1 item (+3.3pp) genius adds value; +/-0 items neutral; <= -1 item genius hurts",
+   "H_C_cost": "MGEN wall per item reported honestly; no success gate (CPU has no true parallelism; wall = 4 serial generations)",
+   "H_D_theory": "user theory WORKS iff H_A SUCCESS and H_B not hurt; PARTIAL iff H_A PARTIAL; FAILS otherwise"
+  }
+ },
+ "tracking": {
+  "artifacts_planned": ["wspl_br2_prereg.json", "wspl_br2_results.json", "br2_eval.py", "br2_assemble.py", "docs/BR2.md"],
+  "states": "realbench_cache/br2_eval/state_MGEN.json (per-candidate checkpoints), state_M4.json",
+  "push_policy": "results+prereg+code+doc pushed to GitHub NSC-1 after verdict (plugin permitting; C1+BR-1 records remain staged from previous session)"
+ },
+ "amendments": []
+}

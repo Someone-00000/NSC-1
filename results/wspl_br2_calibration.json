@@ -1,0 +1,30 @@
+{
+ "version": "br2_calibration",
+ "date": "2026-11-24",
+ "prereg_sha_frozen": "8f2bd19155004a4904107862cdd4b8cf5f68828c117940f79367a1b8551a4483",
+ "cal_items": "train pool indices 11+41k, k=0..11 (zero test data)",
+ "max_new": 256,
+ "summary": {
+  "alpha_0.0": {
+   "n": 12,
+   "strict": 4,
+   "strict_acc": 0.3333333333333333,
+   "tok_per_s": 8.38
+  },
+  "alpha_0.5": {
+   "n": 12,
+   "strict": 4,
+   "strict_acc": 0.3333333333333333,
+   "tok_per_s": 8.34
+  },
+  "alpha_1.0": {
+   "n": 12,
+   "strict": 4,
+   "strict_acc": 0.3333333333333333,
+   "tok_per_s": 8.37
+  }
+ },
+ "alpha_star": 0.0,
+ "mechanism_M_verdict_at_calibration": "FAIL (alpha*=0; M eval arm skipped per frozen rule)",
+ "heads_sha256": "3823c4e76519f836fdc36c30ca633df2b3c85c573af99658e7c407f6fad9c25c"
+}
