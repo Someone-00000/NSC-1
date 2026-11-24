@@ -1,0 +1,250 @@
+{
+ "version": "br2_round2",
+ "date": "2026-11-24",
+ "prereg": "download/wspl_br2_prereg.json (amendment frozen 09:04 pre-eval; round-1 verdict already assembled 08:47)",
+ "sha256": {
+  "prereg": "31faeb3284da0006cc2738d7f84171769e7f68981feaedc54de71e4be4894f0a",
+  "state_MGEN": "007c15f7c36c1554e030b1735e22f7508a97e429db5dcf0b7d7bbc21fb3c5eed",
+  "state_M4": "91efad6413993b187a4b9f8c325ca0fafb5073f98d0c8b7d176c14bf64563e1f",
+  "eval_script": "04f82e1439c01ce7127d2703d4266cf5e9fc28e4b3457b05a3cec7fbff20fd55",
+  "assemble_script": "f345ecfaf2e144e46307cf1f44b36613641ea87aa8b877c30102984dd49fbc1c",
+  "model_safetensors": "fdf756fa7fcbe7404d5c60e26bff1a0c8b8aa1f72ced49e7dd0210fe288fb7fe",
+  "genius_heads": "d2885e6bf7a73106ff60aaa844c2004cb3415a4d12739f741167e419a205176f"
+ },
+ "mgen_pool": {
+  "items": 30,
+  "K": 4,
+  "temp": 0.7,
+  "seeds": "1000003+idx*7919+cand",
+  "anchor_bit_identical_to_A_br": "30/30",
+  "anchor_strict": 11,
+  "anchor_acc": 0.3667,
+  "oracle_bestof4": 17,
+  "oracle_acc": 0.5667,
+  "items_ge2_distinct_preds": 28,
+  "tokens_total": 25696
+ },
+ "refinement_arms_frozen": {
+  "M1_fusion_beta0.5": {
+   "strict": 15,
+   "acc": 0.5
+  },
+  "M2_majority_control": {
+   "strict": 13,
+   "acc": 0.4333
+  },
+  "M3_genius_only": {
+   "strict": 13,
+   "acc": 0.4333
+  }
+ },
+ "M4_as_run": {
+  "strict": 11,
+  "acc": 0.3667,
+  "mix_steps": 0,
+  "steps": 5419,
+  "bit_identical_to_A_br": "30/30 (verified item-by-item vs realbench_cache/br1_eval/state_A.json ids)",
+  "tokens": 5419,
+  "wall_s": 662.8,
+  "tok_per_s": 8.18
+ },
+ "verdict_bands_frozen": {
+  "H_A_accuracy": "M1 vs M0 0.3667: SUCCESS >= 14/30 (46.7%) | PARTIAL = 13/30 (43.3%) | FAIL <= 12/30",
+  "H_B_genius_adds": "M1 - M2: >= +1 item YES | 0 neutral | <= -1 hurts",
+  "H_D_theory": "WORKS iff H_A SUCCESS and H_B not hurt; PARTIAL iff H_A PARTIAL; FAILS otherwise"
+ },
+ "verdict": {
+  "H_A_accuracy": "SUCCESS (M1 15/30 vs M0 11/30, delta +4)",
+  "H_B_genius_adds": "YES (M1-M2 = +2 items)",
+  "H_D_user_theory": "WORKS - genius-reasoned refinement over whole answers WORKS on accuracy: M1 15/30 = 50.0% (+4 items = +13.3pp over the greedy anchor, exactly tying the C1 verbose 50.0% baseline on the digit-dense prompt) and beats pure majority voting by +2 items; it recovered 4 anchor-wrong items and destroyed ZERO anchor-correct items; cost: 87.7s serial per item vs ~32s single-answer (no speed claim, per frozen H_C)",
+  "M4_mixing_as_written": "NO-OP: frozen trigger never fires (scale bug disclosed) -> bit-identical baseline; combined with round-1 calibration (alpha*=0) and NCM-A1 alpha=4 co-writing (same 36.67%, corrupts arithmetic on 5+ items): WEIGHT MIXING IS EXHAUSTIVELY NEGATIVE on this 0.5B genius"
+ },
+ "disclosures": [
+  "PREREG SCALE BUG (found at run time, disclosed): prereg M4 rule says 'softmax max-conf >= tau_1 (0.938 from BR-1 heads)', but BR-1 tau[0]=0.9378 was calibrated on RAW max-logit scale (br1_build.py: conf=Zva.max(1)). Softmax prob >= 0.938 is effectively unreachable -> mix_steps=0 over 5,419 steps -> M4 is a bit-identical baseline replica (36.67%). The frozen text wins as-written; result reported as such.",
+  "The earlier in-session mixing run reported to the user (13 argmax flips in 8,187 steps, 43.3% strict, verbose prompt) lost its state file in the sandbox recycle and cannot be re-verified; it is superseded by this as-written re-run. The 'mixing fails / no material effect' conclusion is unchanged in direction (0 flips -> exactly baseline; 13 flips -> 43.3%, both at-or-below the 50% verbose reference).",
+  "Sandbox recycle between MGEN item 222 and 265: environment rebuilt (torch/transformers/scipy reinstalled, model re-fetched + SHA re-verified, gsm8k cache rebuilt), state resumed with zero rerun.",
+  "Second sandbox recycle post-completion: MGEN/M4 states and assemble output lost; full re-run reproduced bit-identical counters (MGEN 25707/25696, M4 5419/5419) and the same arm results - recorded as an unplanned determinism verification."
+ ],
+ "per_item": [
+  {
+   "idx": 7,
+   "gold": 160.0,
+   "preds": [100.0, 200.0, 1.0, 18.0],
+   "M1": false, "M2": false, "M3": false
+  },
+  {
+   "idx": 50,
+   "gold": 294.0,
+   "preds": [292.0, 252.0, 43912.0, 294.0],
+   "M1": false, "M2": false, "M3": false
+  },
+  {
+   "idx": 93,
+   "gold": 36.0,
+   "preds": [40.0, 38.0, 1158.64, 34.2],
+   "M1": false, "M2": false, "M3": false
+  },
+  {
+   "idx": 136,
+   "gold": 6.0,
+   "preds": [6.0, 6.0, 4.0, 6.0],
+   "M1": true, "M2": true, "M3": true
+  },
+  {
+   "idx": 179,
+   "gold": 130.0,
+   "preds": [130.0, 50.0, 130.0, 130.0],
+   "M1": true, "M2": true, "M3": true
+  },
+  {
+   "idx": 222,
+   "gold": 140.0,
+   "preds": [140.0, 130.0, 140.0, 140.0],
+   "M1": true, "M2": true, "M3": true
+  },
+  {
+   "idx": 265,
+   "gold": 9500.0,
+   "preds": [10075.0, 5500.0, 50000.0, 400000.0],
+   "M1": false, "M2": false, "M3": false
+  },
+  {
+   "idx": 308,
+   "gold": 6.0,
+   "preds": [17.0, 20.0, 18.0, 24.0],
+   "M1": false, "M2": false, "M3": false
+  },
+  {
+   "idx": 351,
+   "gold": 10.0,
+   "preds": [10.0, 80.0, -10.0, 90.0],
+   "M1": true, "M2": true, "M3": true
+  },
+  {
+   "idx": 394,
+   "gold": 92.0,
+   "preds": [0.0, 20.0, 2.0, 32.0],
+   "M1": false, "M2": false, "M3": false
+  },
+  {
+   "idx": 437,
+   "gold": 7.0,
+   "preds": [8.0, 62.0, 8.0, 84.0],
+   "M1": false, "M2": false, "M3": false
+  },
+  {
+   "idx": 480,
+   "gold": 11.0,
+   "preds": [12.0, 4.0, 12.0, 14.0],
+   "M1": false, "M2": false, "M3": false
+  },
+  {
+   "idx": 523,
+   "gold": 74.0,
+   "preds": [107.0, 200.0, 231.0, 268.0],
+   "M1": false, "M2": false, "M3": false
+  },
+  {
+   "idx": 566,
+   "gold": 10.0,
+   "preds": [11.0, 18.0, 10.0, 18.0],
+   "M1": true, "M2": false, "M3": true
+  },
+  {
+   "idx": 609,
+   "gold": 7.0,
+   "preds": [4.0, 576.0, 16.0, 84.0],
+   "M1": false, "M2": false, "M3": false
+  },
+  {
+   "idx": 652,
+   "gold": 75.0,
+   "preds": [30.0, 1.0, 120.0, 455.0],
+   "M1": false, "M2": false, "M3": false
+  },
+  {
+   "idx": 695,
+   "gold": 5.0,
+   "preds": [2.0, 4.0, 5.0, 5.0],
+   "M1": true, "M2": true, "M3": true
+  },
+  {
+   "idx": 738,
+   "gold": 4.0,
+   "preds": [4.0, 10.0, 20.0, 4.0],
+   "M1": true, "M2": true, "M3": true
+  },
+  {
+   "idx": 781,
+   "gold": 17.0,
+   "preds": [-224.0, 2.0, 16.0, 3.0],
+   "M1": false, "M2": false, "M3": false
+  },
+  {
+   "idx": 824,
+   "gold": 52.0,
+   "preds": [52.0, 52.0, 52.0, 52.0],
+   "M1": true, "M2": true, "M3": true
+  },
+  {
+   "idx": 867,
+   "gold": 7.0,
+   "preds": [2.0, 12.0, 7.0, 7.0],
+   "M1": false, "M2": true, "M3": false
+  },
+  {
+   "idx": 910,
+   "gold": 700.0,
+   "preds": [300.0, 300.0, 700.0, 700.0],
+   "M1": true, "M2": true, "M3": true
+  },
+  {
+   "idx": 953,
+   "gold": 452.0,
+   "preds": [2.0, 18.0, 5.0, 48.0],
+   "M1": false, "M2": false, "M3": false
+  },
+  {
+   "idx": 996,
+   "gold": 3.0,
+   "preds": [11.0, 9.0, 3.0, 6.0],
+   "M1": true, "M2": false, "M3": true
+  },
+  {
+   "idx": 1039,
+   "gold": 160.0,
+   "preds": [160.0, 144.0, 64.0, 160.0],
+   "M1": true, "M2": true, "M3": true
+  },
+  {
+   "idx": 1082,
+   "gold": 2.0,
+   "preds": [2.0, 30.0, 3.0, 2.0],
+   "M1": true, "M2": true, "M3": false
+  },
+  {
+   "idx": 1125,
+   "gold": 90.0,
+   "preds": [3.0, 3.0, 3.0, 3.0],
+   "M1": false, "M2": false, "M3": false
+  },
+  {
+   "idx": 1168,
+   "gold": 20.0,
+   "preds": [20.0, 29.0, 44.0, 16.0],
+   "M1": true, "M2": true, "M3": true
+  },
+  {
+   "idx": 1211,
+   "gold": 448.0,
+   "preds": [448.0, 80.0, 56.0, 448.0],
+   "M1": true, "M2": true, "M3": false
+  },
+  {
+   "idx": 1254,
+   "gold": 30.0,
+   "preds": [30.0, 72.0, 5.0, 5.0],
+   "M1": true, "M2": false, "M3": true
+  }
+ ]
+}
