@@ -1,0 +1,66 @@
+{
+ "version": "ncm_a1",
+ "date": "2026-11-24",
+ "frozen_before_any_build_or_eval": true,
+ "experiment_name": "NCM-A1: ANSWER-level parallel generation - batched pool of K whole answers with genius-weight logit mixing, then genius reasons over the pool and refines to one answer",
+ "user_theory_under_test": "Mix genius weights with the normal model weights so both hold the context together; instead of generating one token (or one short block), generate MULTIPLE WHOLE ANSWERS together; the genius then reasons over those answers and refines them into ONE answer. Speed should come from generating many tokens at once; accuracy should come from reasoning over the pool.",
+ "why_answer_level_can_win_on_speed_where_token_blocks_did_not": "C1/BR-1 token-level blocks capped at ~1.01x because each proposed block costs an extra verify forward and blocks average ~1 extra token. On this CPU, decode is memory-bandwidth-bound (~988 MB weights read per forward): batching K=4 whole-answer rollouts into one forward produces 4 tokens per weight-read, amortizing the dominant cost - a real mechanism, not a marginal one.",
+ "parent": "br1 (heads d2885e6b..., digit-dense prompt, eval set 7+43k) - genius heads are ALREADY compiled and RAM-resident; no new compile, no new training",
+ "model_frozen": {
+  "path": "/home/z/my-project/models/qwen25-05b/model.safetensors",
+  "expected_sha256": "fdf756fa7fcbe7404d5c60e26bff1a0c8b8aa1f72ced49e7dd0210fe288fb7fe",
+  "genius_heads": "/home/z/my-project/download/wspl_br1_heads.npz",
+  "genius_heads_sha256": "d2885e6bf7a73106ff60aaa844c2004cb3415a4d12739f741167e419a205176f",
+  "note": "GATE-3 re-verified at run start; same heads as BR-1 (RAM-resident genius weights 'waiting for weights to come' - they are already here)"
+ },
+ "no_gradients": true,
+ "pool_protocol_frozen": {
+  "K": 4,
+  "rollout_mixing_alphas": [0.0, 0.5, 1.0, 1.5],
+  "mixing_rule": "per decode step, for rollout rows with alpha>0: logits[u] += alpha * z_u for u in U (12 frozen universe ids), where z_u = H1 genius head standardized score for class u at the current hidden state (the genius is literally mixed into the model's output weights at generation time; both hold the context together)",
+  "decoding": "greedy per rollout (deterministic, no sampling, no RNG); K rollouts batched in ONE forward per step (left-padded prompts, per-row EOS handling: finished rows keep emitting EOS, excluded from token counts)",
+  "prompt": "same digit-dense prompt as BR-1 (fewshot train items 0,1 digit-dense, same instruction string)",
+  "max_new_tokens": 384,
+  "items": "GSM8K test indices [7+43*k for k in 0..29] (same frozen 30 as C1/BR-1)",
+  "per_step_capture": "chosen-token full-vocab logprob, H1 max z (confidence), H1 argmax agreement flag for tokens in U, per-row generated ids",
+  "threads": 2, "dtype": "float32"
+ },
+ "selection_protocol_frozen": {
+  "candidate_answer": "decoded rollout text; strict value = '#### N' if present else last number (abstention counts wrong - consistent with all prior arms)",
+  "genius_score_frozen": "mean over answer-region generated tokens t of (agreement_t * conf_t) where agreement_t = 1 if H1 argmax == generated token and generated token in U else 0, conf_t = H1 max z; candidates with zero U tokens score -inf (ranked last)",
+  "logprob_score_frozen": "mean full-vocab logprob of generated tokens (length-normalized)",
+  "fusion_score_frozen": "z-score(genius_score) + z-score(logprob_score) across the K candidates of the same item (z over K=4 values; if a score is constant across candidates, its z contribution is 0)",
+  "selection_arms": {
+   "sel_genius": "argmax genius_score - the genius reasons over the pool and picks one answer",
+   "sel_logprob": "argmax logprob_score - the model alone picks one answer (no-genius control)",
+   "sel_fusion": "argmax fusion_score - 50/50 genius+model"
+  },
+  "oracle_diagnostic": "any candidate strict-correct in pool (pool ceiling; separate generation failure from selection failure, same philosophy as the KGAT oracle)"
+ },
+ "gates_frozen": {
+  "GATE-3_model_identity": "sha256 verified at run start",
+  "GATE-H_heads_identity": "wspl_br1_heads.npz sha256 == d2885e6b... at run start",
+  "GATE-0_gold_alignment": "30/30 golds match frozen state_test",
+  "GATE-alpha0_anchor": "alpha=0 rollout must reproduce BR-1 arm-A answers on >= 28/30 items (same prompt, same greedy; small fp differences from batched forwards allowed) - anchors pool validity"
+ },
+ "verdict_bands_frozen": {
+  "accuracy": "best selection arm strict vs A_br 36.67%: SUCCESS >= 46.67% (+10pp); PARTIAL >= 41.67% (+5pp); FAIL otherwise; reference line: C1 verbose baseline 50.0%",
+  "speed": "aggregate tok/s of the batched pool (all K rollout tokens / wall) vs A_br 8.69: SUCCESS >= 1.5x; PARTIAL >= 1.2x; FAIL otherwise",
+  "genius_signal": "sel_genius >= sel_logprob strict -> genius adds selection signal: YES / NO",
+  "diversity_diagnostic": "share of items whose pool contains >= 2 distinct final answers (target >= 0.5, else mixing failed to diversify - disclosed, no band)"
+ },
+ "hypotheses": {
+  "H-A1-speed": "batched whole-answer generation reaches >= 1.2x aggregate tok/s (memory-bandwidth amortization)",
+  "H-A1-diversity": "genius-logit mixing creates pool diversity (>= 2 distinct answers in >= 50% of items)",
+  "H-A1-acc": "genius reasoning over the pool refines to an answer at least +5pp above the single-greedy baseline without dropping below it",
+  "H-A1-genius": "the genius selection signal beats pure model logprob selection"
+ },
+ "tracking": {
+  "artifacts_planned": ["wspl_ncm_a1_prereg.json", "wspl_ncm_a1_pool_state.json", "wspl_ncm_a1_results.json", "ncm_a1_eval.py", "ncm_a1_assemble.py", "docs/NCM_A1.md"],
+  "push_policy": "prereg SHA frozen now; all artifacts SHA256; push to GitHub NSC-1 when plugin calls work"
+ },
+ "amendments": [
+  "amendment_1 (disclosed, PRE-RESULTS, first 7-item slice VOIDED): raw-z mixing measured ineffective - diagnostic on item 7 (60 decode steps): median margin top-logit minus best-digit-logit = 14.81 (p10 1.66, p90 17.55) vs median z_max = 0.29 (p90 0.44); flip rates with raw z: alpha 0.5->0.0%, 1->0.0%, 2->1.67%, 4->1.67%, 8->3.33%; all four alpha rows produced identical answers on every voided item. New frozen rule: per step per row, z_hat = z / max|z| (max-normalized, sign preserved; zero if max|z|=0), mixed logits lg[U] += alpha * z_hat with alpha grid {0, 4, 8, 16} - alpha=4 flips only the lowest-margin steps, alpha=8 the lower quartile zone, alpha=16 flips ~half the steps (margin p50 14.8 < 16). Rationale: spans model-led to genius-led mixing; genius confidence magnitude is intentionally discarded by max-normalization (disclosed limitation). No results were reported from the voided slice.",
+  "amendment_2 (disclosed, PRE-RESULTS, 4-item interim slice VOIDED): max-normalized mixing works mechanically (alpha=4 changes answers) but alpha=8/16 degenerate to digit soup - genius digit bias injected mid-calculation corrupts arithmetic (observed preds 2e+306, inf on items 7/50/93/136; alpha=0 anchor still matches A_br exactly). New frozen pool row spec: row0 = greedy anchor (alpha=0, no mixing), row1 = genius-mixed greedy alpha=4 (z_hat rule unchanged), row2 = pure-model sampling T=0.8, row3 = pure-model sampling T=1.0; sampling seeds frozen: torch.Generator(seed=1000003*item_idx + row_index) per rollout, multinomial on softmax(logits/T); sampling rows have NO genius mixing (clean attribution: genius co-writing diversity vs model self-consistency diversity). Rationale: tests the user theory (multiple answers together, genius reasons over them) against the strongest standard baseline (self-consistency) in the same batched pool. No results were reported from the voided interim slice."
+ ]
+}
