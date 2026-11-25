@@ -69,6 +69,15 @@ Two preregistered experiments tested it:
 - Answer-region interpretation and tie-break conventions disclosed inside the results JSONs.
 - BR-2 round-1 artifacts (prereg 48779fa8→31faeb32, calibration 38baa372, results with A2/P arms) were lost in the final hard reset; their SHA256 identities are recorded in `results/wspl_br2_round2_results.json` and the numbers survive in this doc's round-1 references (A2 rebaseline 15/30 = 50.0% bit-identical to C1; P arm 12/30 = 40.0% FAIL vs oracle 60%).
 
+### Addendum (2026-11-25, post-publication recovery and verification)
+
+- **Recovery:** the snapshot restore behind the losses above was partial — `results/wspl_br2_results.json` (round-1, mtime 08:47:51Z) and the round-1 doc `docs/BR2.md` **survived** and are now pushed verbatim; the "lost" statement above is thereby narrowed to the round-1 *state* files (`state_A2`, `state_P`) and the original (pre-amendment) prereg bytes, which remain lost.
+- **Chain re-verified on disk (2026-11-25):** amended prereg `31faeb32…` PASS, calibration `38baa372…` PASS, genius heads `d2885e6b…` PASS, `br2_eval.py` = round-2 as-run `04f82e14…` PASS, `ncm_a1_eval.py` = `c398374f…` PASS, `br1_build.py` = `c7312b23…` PASS, `br1_eval.py` = `ec6c26e7…` PASS, `br2_common.py` = `b49adae0…` PASS, `br2_calibrate.py` = `813be463…` PASS.
+- **Two provenance gaps disclosed (verdict unaffected):**
+  1. The round-2 `assemble_script` SHA `f345ecfa…` does not match the surviving `br2_assemble.py` (`26db928a…`, mtime 08:47 = the round-1 assembler). The snapshot restore rolled the round-2 assembler back; its exact bytes are lost and only the SHA survives in the results JSON. Mitigation: the assembled per-item records were re-verified against the surviving MGEN state — **27/27 overlapping items match pred-for-pred** — and the three items missing from the rolled-back state (1168, 1211, 1254) are complete in the results JSON.
+  2. `state_MGEN.json` on disk now holds a 27/30 partial (tokens 23,807, SHA `dc048381…`), not the complete 30/30 state (`007c15f7…`, tokens 25,696) recorded in the results JSON. Same rollback mechanism; the complete state exists only as that recorded SHA.
+- The SHA-referenced experiment code (NCM-C1, BR-1, BR-2, NCM-A1) now lives under `code/wspl/` so every script SHA recorded in the results JSONs is checkable against a pushed file (exceptions: the two lost-bytes cases above). KGAT-ladder scripts remain sandbox-side — no pushed digest records their SHAs.
+
 ## Bottom line
 
 > **Generate whole answers together, then let genius+model jointly reason them into one — that WORKS (50.0%, +13.3pp, zero anchor damage, beats majority by 2 items). But it is an accuracy lever that costs compute, not a speed lever: batched generation only reaches 1.15× end-to-end, and weight-mixing the genius into the model is a dead end in every form we tested.** The next lever for speed is making the *refinement* free (the genius head already lives in RAM next to the weights) rather than making generation wider.

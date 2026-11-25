@@ -1,0 +1,111 @@
+{
+ "version": "br2",
+ "date": "2026-11-24",
+ "prereg": "download/wspl_br2_prereg.json (with amendment_1, frozen pre-eval)",
+ "sha256": {
+  "prereg": "48779fa837720f9f28ecfa5ea54b9f53256a590bd3c6cb9948df56277bb20dfd",
+  "calibration": "38baa372f881315e4b47f51509d0cace3627719a9c02413fdfc58691b31c4838",
+  "heads_c1": "3823c4e76519f836fdc36c30ca633df2b3c85c573af99658e7c407f6fad9c25c",
+  "model_safetensors": "fdf756fa7fcbe7404d5c60e26bff1a0c8b8aa1f72ced49e7dd0210fe288fb7fe",
+  "state_A2": "4745409006fa6b5c8921630dd0e1fe625bf7f2039309141d4c25650a6c03c865",
+  "state_P": "8a1d1c049b87974b4b5c243dedda83a3a385735b32db9716124aa787b0afeaed",
+  "br2_common_py": "b49adae0a6a51e16e6d9b0163ba4cd2523b2589ba20b558e1606328c067ffa2f",
+  "br2_calibrate_py": "813be4636e8b035273ca49381510903c514db352aa66f0671d8112fd4933a0c6",
+  "br2_eval_py": "5a2ccb711ffdc0e2742758458bed31fa801166914326ec81282d7d72cd16ffbf"
+ },
+ "amendments": [
+  {
+   "id": "amendment_1_pre_eval_disclosed",
+   "triggers": [
+    "calibration: alpha 0.0/0.5/1.0 all tie 4/12 -> alpha*=0 -> M arm skipped per frozen rule",
+    "diagnostic br2_divprobe.py (disclosed): greedy trajectories identical to plain at alpha in {1,2,4,8} for 120 tokens on eval-family item 7; genius-H1 agrees with model argmax ~96% (probe val), so weight-mix cannot diversify drafts at any practical strength"
+   ],
+   "changes": [
+    "P-arm drafts: [plain greedy anchor (reuses A2 state output), 3 x temperature-0.8 full-vocabulary sampled drafts, seeds 1001/1002/1003]; sampled drafts generated sequentially (wall-equivalent to batched on 2-thread CPU, simpler EOS bookkeeping)",
+    "selection/refinement mechanism UNCHANGED: genius-H1 agreement score, tie -> shorter draft, tie -> greedy anchor; oracle best-of-4 diagnostic unchanged",
+    "rationale: user directive is generate-multiple-whole-answers + genius-reasons-over-them; temperature sampling is the standard no-training diversity source; greedy anchor preserves the A2-equivalent candidate in the pool"
+   ]
+  }
+ ],
+ "environment": {
+  "torch": "2.15.0+cpu",
+  "transformers": "5.24.0",
+  "threads": 2,
+  "dtype": "float32",
+  "heads": "C1 H1..H4 npz (verbose-format-matched); H1 used for mixing/scoring"
+ },
+ "calibration": {
+  "summary": {
+   "alpha_0.0": {
+    "n": 12,
+    "strict": 4,
+    "strict_acc": 0.3333333333333333,
+    "tok_per_s": 8.38
+   },
+   "alpha_0.5": {
+    "n": 12,
+    "strict": 4,
+    "strict_acc": 0.3333333333333333,
+    "tok_per_s": 8.34
+   },
+   "alpha_1.0": {
+    "n": 12,
+    "strict": 4,
+    "strict_acc": 0.3333333333333333,
+    "tok_per_s": 8.37
+   }
+  },
+  "alpha_star": 0.0,
+  "mechanism_M_verdict": "FAIL (alpha*=0; M eval arm skipped per frozen rule)",
+  "note": "all three alphas tie 4/12 with identical correct-sets; divprobe (disclosed) shows greedy trajectories identical to plain at alpha up to 8.0 - genius-H1 agrees with model argmax ~96%, mixing cannot steer greedy decode"
+ },
+ "A2_rebaseline": {
+  "n": 30,
+  "strict": 15,
+  "strict_acc": 0.5,
+  "tokens": 8065,
+  "wall_gen_s": 961.0,
+  "tok_per_s": 8.39,
+  "vs_C1_armA": "strict 0.50 == 0.50, tokens 8065 == 8065 (bit-identical regeneration post-recovery), tok/s 8.39 vs 8.35"
+ },
+ "M_arm": {
+  "status": "SKIPPED per frozen calibration rule (alpha*=0)"
+ },
+ "P_arm": {
+  "n": 30,
+  "winner_strict": 12,
+  "winner_strict_acc": 0.4,
+  "oracle_bestof4": 0.6,
+  "anchor_strict_in_pool": 15,
+  "wall_total_s": 3353.8,
+  "avg_wall_per_item_s": 111.8,
+  "wall_multiplier_vs_A2": 3.49,
+  "unique_draft_fraction": 1.0,
+  "winner_kind_dist": {
+   "greedy_anchor": 15,
+   "temp0.8_seed1002": 6,
+   "temp0.8_seed1003": 3,
+   "temp0.8_seed1001": 6
+  },
+  "selection_analysis": {
+   "oracle_true_items": 18,
+   "anchor_right_of_those": 15,
+   "anchor_wrong_but_pool_has_correct": 3,
+   "kept_correct_anchor": 12,
+   "lost_correct_anchor_to_wrong_draft": 3,
+   "recovered_salvageable": 0,
+   "top_score_ties": 12,
+   "tie_break_picked_shorter_sampled": 0
+  }
+ },
+ "bug_disclosure": {
+  "scoring_index_bug": "first P run scored 0.0 everywhere: argmax index (0..11) was compared to token id (15..24/198/151645); caught by position-level debug on item 7 (actual agreement 5/5 in window), fixed to U_IDS[argmax]==next, poisoned P state wiped and rerun from scratch - no results were reported from the buggy run"
+ },
+ "verdict_bands": {
+  "M_vs_A2": "FAIL AT CALIBRATION (alpha*=0.0 per frozen tie rule; arm skipped)",
+  "P_vs_A2": "FAIL (delta -10.0pp, band +/-6.67pp)",
+  "speed_M": "n/a (M skipped)",
+  "speed_P": "wall multiplier 3.49x (P costs more wall by design: 3 extra drafts + scoring pass; no speed claim)"
+ },
+ "verdict": "MIXED MIND FAILS AS A STEERER; WHOLE-ANSWER POOL HAS REAL HEADROOM BUT THE GENIUS AGREEMENT SCORE CANNOT HARVEST IT - P FAILS THE FROZEN BAND. (1) Mixing genius weights into the model's own output weights is a NO-OP on greedy decode: calibration tied 4/12 across alpha 0/0.5/1.0 (identical correct-sets), and the disclosed probe shows trajectories identical at alpha up to 8.0. The genius head was compiled FROM the model's own behavior and agrees with its argmax ~96% of the time - it is a compressed mirror, not an independent expert, so 'both minds holding context together' adds nothing the model does not already think. M arm skipped per frozen rule. (2) Whole-answer parallelism itself is validated: 4/4 unique drafts on every item, and the best-of-4 oracle ceiling is 18/30 = 60.0% vs single-answer 50.0% - the pool DOES contain better answers, the user's intuition is right. (3) But the genius refinement step cannot find them: raw agreement saturates (top-score ties on 12/30 items), recovered 0/3 salvageable items, and its shorter-tie-break threw away 3 correct anchors (tie-break picked a wrong, shorter sampled draft). Winner strict 12/30 = 40.0% vs anchor 50.0% = -10.0pp -> FAIL per frozen band (and 3.49x wall cost). HONEST BOTTOM LINE: per the user's own rule, P as implemented is NOT a win - accuracy dropped and wall time grew 3.5x. The experiment localizes the failure precisely: the pool has the answers (oracle 60%), the selector is the wall (agreement saturates at 1.0). The fix is a discriminating score - e.g. genius-model disagreement density or confidence-profile matching - not more drafts."
+}
