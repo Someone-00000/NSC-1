@@ -77,8 +77,10 @@ Weight mixing (genius logits into the model's logits) is **exhaustively negative
 independent tests**: calibration α*=0 (mirror), M4 frozen trigger never fires (bit-identical
 baseline), α=4 co-writing corrupts arithmetic. Full record:
 [docs/NCM_C1.md](docs/NCM_C1.md), [docs/BR1.md](docs/BR1.md), [docs/BR2.md](docs/BR2.md),
-[docs/BR2_R2_NCM_A1.md](docs/BR2_R2_NCM_A1.md). Preregs and results under `results/wspl_*` /
-`results/ncm_*`; experiment code under `code/wspl/`.
+[docs/BR2_R2_NCM_A1.md](docs/BR2_R2_NCM_A1.md). Preregs and results live under `results/wspl_*` /
+`results/ncm_*`. The experiment code stayed sandbox-side and was lost to a snapshot rollback before
+publication — the script SHAs recorded inside each results JSON are the code identity anchors
+(see the [BR2_R2_NCM_A1.md](docs/BR2_R2_NCM_A1.md) addendum).
 
 ## Honesty notes
 
@@ -95,7 +97,6 @@ baseline), α=4 co-writing corrupts arithmetic. Full record:
 
 ```
 code/       kernel sources (run on Kaggle GPU)
-  wspl/                 WSPL-line experiment code (NCM-C1, BR-1, BR-2, NCM-A1; CPU sandbox; KGAT scripts sandbox-side)
   nsc_model.py          NSC-1 architecture (Stage A + GateBlock + LM, 454M config)
   nsc_stage_a.py        frozen subconscious appraiser (sid tagger)
   nsc_world.py          synthetic world generator, scorer, encoders
