@@ -60,6 +60,26 @@ Full record, protocol explanations and the oracle metric definition:
 [docs/KGAT_LADDER.md](docs/KGAT_LADDER.md). Frozen preregs, result digests and the compiled head
 weights live under `results/kgat_*`.
 
+## Genius heads on a live model — NCM-C1 → BR-1 → BR-2 → NCM-A1 (2026-11-24)
+
+The ladder's compiled selection head ("genius": closed-form IRLS/ridge, no gradients, 321 KB,
+RAM-resident) was then run next to a live Qwen2.5-0.5B-Instruct **during generation**, on 30 frozen
+GSM8K items with frozen preregistered verdict bands:
+
+| experiment | mechanism | headline |
+|---|---|---|
+| NCM-C1 | genius block-proposes, model verifies/reasons | accuracy exact (B == A, 50.0%), speed MARGINAL (1.01×, band [0.95,1.10)) |
+| BR-1 | same at 2× probes / 8 horizons, digit-dense prompt | compile scales (13,874 rows, 8.07 s, bit-exact); digit-dense prompt costs −13.3pp; fire-rate lever REJECTED (7.01% < 8% bar) |
+| BR-2 round 2 | K=4 whole answers → genius+model fusion refinement (M1) | **WORKS: 50.0% = +13.3pp over the greedy anchor, zero anchor damage, beats majority vote by +2** — but 2.7× wall, an accuracy lever not a speed lever |
+| NCM-A1 | 4-row batched pool (speed half of the theory) | 1.15× tok/s — FAIL vs the 1.5× bar; genius agreement score is **circular** (ranks text it co-wrote highest, even `2e+306` garbage) |
+
+Weight mixing (genius logits into the model's logits) is **exhaustively negative in three
+independent tests**: calibration α*=0 (mirror), M4 frozen trigger never fires (bit-identical
+baseline), α=4 co-writing corrupts arithmetic. Full record:
+[docs/NCM_C1.md](docs/NCM_C1.md), [docs/BR1.md](docs/BR1.md), [docs/BR2.md](docs/BR2.md),
+[docs/BR2_R2_NCM_A1.md](docs/BR2_R2_NCM_A1.md). Preregs and results under `results/wspl_*` /
+`results/ncm_*`; experiment code under `code/wspl/`.
+
 ## Honesty notes
 
 - The real-model gate ON/OFF suite in `nsc1_qwen_graft.py` generated through
@@ -75,6 +95,7 @@ weights live under `results/kgat_*`.
 
 ```
 code/       kernel sources (run on Kaggle GPU)
+  wspl/                 WSPL-line experiment code (NCM-C1, BR-1, BR-2, NCM-A1; CPU sandbox; KGAT scripts sandbox-side)
   nsc_model.py          NSC-1 architecture (Stage A + GateBlock + LM, 454M config)
   nsc_stage_a.py        frozen subconscious appraiser (sid tagger)
   nsc_world.py          synthetic world generator, scorer, encoders
@@ -88,8 +109,10 @@ data/       synthetic world data (tagged pool, distill sets, exam, bench pack)
 artifacts/  ckpt_a.pt — Stage A weights (5 MB)
 results/    raw result files from every kernel (JSON / JSONL, unmodified)
             + kgat_* — WSPL KGAT ladder preregs / digests / compiled weights
+            + wspl_* / ncm_* — genius-head line preregs / results (C1, BR-1, BR-2 r1+r2, NCM-A1)
 docs/       THEORY.md (why this architecture exists), RESULTS.md (all numbers),
             KGAT_LADDER.md (WSPL ladder record: protocol, oracle metric, verdicts)
+            NCM_C1.md / BR1.md / BR2.md / BR2_R2_NCM_A1.md (genius-head line record)
 ```
 
 ## Reproduce
